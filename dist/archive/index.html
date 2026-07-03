@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Archivo de reportes semanales</title>
+<style>
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --ink: #1c2733;
+  --muted: #5c6b7a;
+  --accent: #0f6ab4;
+  --accent-soft: #e3eef8;
+  --good: #2e7d32;
+  --bad: #c62828;
+  --border: #dde3ea;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+}
+.wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 64px; }
+header.report h1 { font-size: 1.5rem; margin: 0 0 4px; }
+header.report .meta { color: var(--muted); font-size: 0.9rem; margin: 0; }
+nav.weeknav {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 12px; margin: 16px 0 24px;
+}
+nav.weeknav a, nav.weeknav span.disabled {
+  text-decoration: none; color: var(--accent); font-size: 0.9rem;
+  padding: 4px 8px; border-radius: 6px;
+}
+nav.weeknav a:hover { background: var(--accent-soft); }
+nav.weeknav span.disabled { color: var(--muted); opacity: 0.5; }
+nav.weeknav select {
+  font-size: 0.9rem; padding: 4px 6px; border-radius: 6px;
+  border: 1px solid var(--border); background: #fff; color: var(--ink);
+}
+nav.weeknav .spacer { flex: 1; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 14px;
+}
+.card .label { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.card .value { font-size: 1.35rem; font-weight: 600; margin-top: 2px; }
+.card .sub { color: var(--muted); font-size: 0.8rem; }
+section { margin-bottom: 28px; }
+section h2 { font-size: 1.1rem; margin: 0 0 10px; }
+table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; font-size: 0.9rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+th { background: var(--accent-soft); font-weight: 600; font-size: 0.82rem; }
+tr:last-child td { border-bottom: none; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.bar { background: var(--accent-soft); border-radius: 4px; height: 10px; position: relative; min-width: 60px; }
+.bar > i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 4px; display: block; }
+.delta-pos { color: var(--good); }
+.delta-neg { color: var(--bad); }
+footer { color: var(--muted); font-size: 0.8rem; margin-top: 40px; border-top: 1px solid var(--border); padding-top: 12px; }
+.archive-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.archive-list li { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.archive-list a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.archive-list .sub { color: var(--muted); font-size: 0.85rem; }
+.empty { color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="report">
+  <h1>Archivo de reportes semanales</h1>
+  <p class="meta">Últimas 12 semanas disponibles</p>
+</header>
+<nav class="weeknav">
+  <a href="../reports/2026-06-22/">Última semana</a>
+</nav>
+
+<ul class="archive-list">
+  
+  <li>
+    <a href="../reports/2026-06-22/">Semana del 22 al 28 de junio de 2026</a>
+    <div class="sub">Generado el 3 de julio de 2026</div>
+  </li>
+  
+  <li>
+    <a href="../reports/2026-06-15/">Semana del 15 al 21 de junio de 2026</a>
+    <div class="sub">Generado el 3 de julio de 2026</div>
+  </li>
+  
+  <li>
+    <a href="../reports/2026-06-08/">Semana del 8 al 14 de junio de 2026</a>
+    <div class="sub">Generado el 3 de julio de 2026</div>
+  </li>
+  
+  <li>
+    <a href="../reports/2026-06-01/">Semana del 1 al 7 de junio de 2026</a>
+    <div class="sub">Generado el 3 de julio de 2026</div>
+  </li>
+  
+  <li>
+    <a href="../reports/2026-05-25/">Semana del 25 al 31 de mayo de 2026</a>
+    <div class="sub">Generado el 3 de julio de 2026</div>
+  </li>
+  
+  <li>
+    <a href="../reports/2026-05-18/">Semana del 18 al 24 de mayo de 2026</a>
+    <div class="sub">Generado el 3 de julio de 2026</div>
+  </li>
+  
+  <li>
+    <a href="../reports/2026-05-11/">Semana del 11 al 17 de mayo de 2026</a>
+    <div class="sub">Generado el 3 de julio de 2026</div>
+  </li>
+  
+  <li>
+    <a href="../reports/2026-05-04/">Semana del 4 al 10 de mayo de 2026</a>
+    <div class="sub">Generado el 3 de julio de 2026</div>
+  </li>
+  
+  <li>
+    <a href="../reports/2026-04-27/">Semana del 27 de abril al 3 de mayo de 2026</a>
+    <div class="sub">Generado el 3 de julio de 2026</div>
+  </li>
+  
+  <li>
+    <a href="../reports/2026-04-20/">Semana del 20 al 26 de abril de 2026</a>
+    <div class="sub">Generado el 3 de julio de 2026</div>
+  </li>
+  
+  <li>
+    <a href="../reports/2026-04-13/">Semana del 13 al 19 de abril de 2026</a>
+    <div class="sub">Generado el 3 de julio de 2026</div>
+  </li>
+  
+  <li>
+    <a href="../reports/2026-04-06/">Semana del 6 al 12 de abril de 2026</a>
+    <div class="sub">Generado el 3 de julio de 2026</div>
+  </li>
+  
+</ul>
+
+</div>
+</body>
+</html>

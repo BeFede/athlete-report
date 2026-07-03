@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Archivo de reportes semanales</title>
+<style>
+{% include "_style.css" %}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="report">
+  <h1>Archivo de reportes semanales</h1>
+  <p class="meta">Últimas {{ entries | length }} semanas disponibles</p>
+</header>
+<nav class="weeknav">
+  <a href="../reports/{{ latest }}/">Última semana</a>
+</nav>
+{% if entries %}
+<ul class="archive-list">
+  {% for e in entries %}
+  <li>
+    <a href="../reports/{{ e.value }}/">{{ e.label }}</a>
+    <div class="sub">Generado el {{ e.generated_on }}{% if e.rebuilt_on %} · reconstruido el {{ e.rebuilt_on }}{% endif %}</div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">Todavía no hay reportes generados.</p>
+{% endif %}
+</div>
+</body>
+</html>

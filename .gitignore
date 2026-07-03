@@ -1,0 +1,14 @@
+# Datos privados: nunca versionar
+data/
+
+# Artefactos de build intermedios
+build/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+*.egg-info/
+
+# dist/ SÍ se versiona: contenido público para GitHub Pages
