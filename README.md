@@ -14,6 +14,15 @@ congelados y publicación temporal en GitHub Pages.
 
 `data/` y `build/` están en `.gitignore`. Sólo `dist/` es público.
 
+## Publicación
+
+Sitio: <https://befede.github.io/athlete-report/> — se despliega automáticamente
+desde `dist/` al pushear a `main` (workflow `.github/workflows/pages.yml`).
+
+**Flujo semanal**: en Claude Code correr `/weekly-report`. Baja los datos
+frescos del MCP de COROS a `data/raw/coros/`, corre `publish` y pushea `dist/`.
+Para despublicar: `uv run athlete-report unpublish` + commit de `dist/`.
+
 ## Comandos
 
 ```bash
