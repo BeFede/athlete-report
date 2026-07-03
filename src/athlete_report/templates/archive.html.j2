@@ -10,23 +10,50 @@
 </style>
 </head>
 <body>
-<div class="wrap">
-<header class="report">
-  <h1>Archivo de reportes semanales</h1>
-  <p class="meta">Últimas {{ entries | length }} semanas disponibles</p>
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">Historial de entrenamiento</p>
+    <h1>Archivo de reportes semanales</h1>
+    <p class="meta">Últimas {{ entries | length }} semanas disponibles</p>
+  </div>
 </header>
+<div class="wrap">
+
 <nav class="weeknav">
   <a href="../reports/{{ latest }}/">Última semana</a>
 </nav>
+
+{% if trend_distance or trend_fitness %}
+<section>
+  <h2>Tendencias</h2>
+  <div class="charts">
+    {% if trend_distance %}
+    <div class="chart-card"><h3>Distancia semanal</h3><p class="sub">km por semana</p>{{ trend_distance }}</div>
+    {% endif %}
+    {% if trend_fitness %}
+    <div class="chart-card"><h3>Fitness y fatiga</h3><p class="sub">al cierre de cada semana</p>{{ trend_fitness }}</div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
 {% if entries %}
+<section>
+<h2>Semanas</h2>
 <ul class="archive-list">
   {% for e in entries %}
   <li>
     <a href="../reports/{{ e.value }}/">{{ e.label }}</a>
+    <span class="stats">
+      {%- if e.sessions %}{{ e.sessions }} sesiones{% endif %}
+      {%- if e.distance %} · {{ e.distance }}{% endif %}
+      {%- if e.duration %} · {{ e.duration }}{% endif -%}
+    </span>
     <div class="sub">Generado el {{ e.generated_on }}{% if e.rebuilt_on %} · reconstruido el {{ e.rebuilt_on }}{% endif %}</div>
   </li>
   {% endfor %}
 </ul>
+</section>
 {% else %}
 <p class="empty">Todavía no hay reportes generados.</p>
 {% endif %}

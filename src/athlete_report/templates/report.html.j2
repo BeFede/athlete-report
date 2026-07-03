@@ -10,13 +10,17 @@
 </style>
 </head>
 <body>
-<div class="wrap">
-<header class="report">
-  <h1>{{ week_title }}</h1>
-  <p class="meta">Generado el {{ generated_on }}</p>
-  <p class="meta">Datos sincronizados hasta el {{ data_as_of_on }}</p>
-  {% if rebuilt_on %}<p class="meta">Reconstruido el {{ rebuilt_on }}</p>{% endif %}
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">Reporte semanal de entrenamiento</p>
+    <h1>{{ week_title }}</h1>
+    <p class="meta">Generado el {{ generated_on }}</p>
+    <p class="meta">Datos sincronizados hasta el {{ data_as_of_on }}</p>
+    {% if rebuilt_on %}<p class="meta">Reconstruido el {{ rebuilt_on }}</p>{% endif %}
+    {% if fitness.status %}<span class="badge">Estado COROS: {{ fitness.status }}</span>{% endif %}
+  </div>
 </header>
+<div class="wrap">
 
 <nav class="weeknav">
   {% if nav.prev %}<a href="../{{ nav.prev }}/">&larr; Semana anterior</a>{% else %}<span class="disabled">&larr; Semana anterior</span>{% endif %}
@@ -35,18 +39,19 @@
 </nav>
 
 <div class="cards">
-  <div class="card"><div class="label">Sesiones</div><div class="value">{{ totals.sessions }}</div></div>
-  <div class="card"><div class="label">Tiempo</div><div class="value">{{ totals.duration }}</div></div>
-  <div class="card"><div class="label">Distancia</div><div class="value">{{ totals.distance }}</div></div>
-  <div class="card"><div class="label">Carga semanal</div><div class="value">{{ totals.load }}</div></div>
-  <div class="card"><div class="label">Fitness (42 d)</div><div class="value">{{ fitness.fitness }}</div></div>
-  <div class="card"><div class="label">Fatiga (7 d)</div><div class="value">{{ fitness.fatigue }}</div></div>
-  <div class="card"><div class="label">Forma</div><div class="value">{{ fitness.form }}</div></div>
+  <div class="card accent"><div class="label">Sesiones</div><div class="value">{{ totals.sessions }}</div></div>
+  <div class="card accent"><div class="label">Tiempo</div><div class="value">{{ totals.duration }}</div></div>
+  <div class="card accent"><div class="label">Distancia</div><div class="value">{{ totals.distance }}</div></div>
+  <div class="card accent"><div class="label">Carga semanal</div><div class="value">{{ totals.load }}</div></div>
+  <div class="card"><div class="label">Fitness</div><div class="value">{{ fitness.fitness }}</div><div class="sub">carga 42 días</div></div>
+  <div class="card"><div class="label">Fatiga</div><div class="value">{{ fitness.fatigue }}</div><div class="sub">carga 7 días</div></div>
+  <div class="card"><div class="label">Forma</div><div class="value">{{ fitness.form }}</div><div class="sub">fitness − fatiga</div></div>
 </div>
 
 <section>
   <h2>Actividades</h2>
   {% if activities %}
+  <div class="table-wrap">
   <table>
     <thead>
       <tr><th>Día</th><th>Actividad</th><th>Deporte</th><th class="num">Tiempo</th><th class="num">Distancia</th><th class="num">FC media</th><th class="num">Carga</th></tr>
@@ -54,57 +59,69 @@
     <tbody>
       {% for a in activities %}
       <tr>
-        <td>{{ a.day }}</td><td>{{ a.name }}</td><td>{{ a.sport }}</td>
+        <td>{{ a.day }}</td><td>{{ a.name }}</td>
+        <td><span class="chip {{ a.sport }}">{{ a.sport_label }}</span></td>
         <td class="num">{{ a.duration }}</td><td class="num">{{ a.distance }}</td>
         <td class="num">{{ a.avg_hr }}</td><td class="num">{{ a.load }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  </div>
   {% else %}<p class="empty">Sin actividades registradas esta semana.</p>{% endif %}
 </section>
 
+{% if has_charts %}
 <section>
-  <h2>Carga diaria</h2>
-  {% if daily_load %}
-  <table>
-    <thead><tr><th>Día</th><th class="num">Carga</th><th style="width:45%">&nbsp;</th></tr></thead>
-    <tbody>
-      {% for d in daily_load %}
-      <tr>
-        <td>{{ d.day }}</td>
-        <td class="num">{{ d.load }}</td>
-        <td><div class="bar"><i style="width: {{ d.pct }}%"></i></div></td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}<p class="empty">Sin datos de carga diaria.</p>{% endif %}
+  <h2>La semana en gráficos</h2>
+  <div class="charts">
+    {% if charts.distance %}
+    <div class="chart-card"><h3>Distancia por día</h3><p class="sub">km</p>{{ charts.distance }}</div>
+    {% endif %}
+    {% if charts.load %}
+    <div class="chart-card"><h3>Carga por día</h3><p class="sub">training load</p>{{ charts.load }}</div>
+    {% endif %}
+    {% if charts.hrv %}
+    <div class="chart-card"><h3>HRV nocturno</h3><p class="sub">ms · línea punteada: media 28 días</p>{{ charts.hrv }}</div>
+    {% endif %}
+    {% if charts.rhr %}
+    <div class="chart-card"><h3>FC en reposo</h3><p class="sub">ppm · línea punteada: media 28 días</p>{{ charts.rhr }}</div>
+    {% endif %}
+    {% if charts.sleep %}
+    <div class="chart-card"><h3>Sueño</h3><p class="sub">horas · línea punteada: media 28 días</p>{{ charts.sleep }}</div>
+    {% endif %}
+  </div>
 </section>
+{% endif %}
 
 <section>
-  <h2>Recuperación</h2>
+  <h2>Recuperación <small>semana vs. baseline 28 días</small></h2>
   {% if daily_rows %}
-  <table>
-    <thead><tr><th>Día</th><th class="num">HRV</th><th class="num">FC reposo</th><th class="num">Sueño</th><th class="num">Puntaje sueño</th></tr></thead>
-    <tbody>
-      {% for m in daily_rows %}
-      <tr>
-        <td>{{ m.day }}</td><td class="num">{{ m.hrv }}</td><td class="num">{{ m.rhr }}</td>
-        <td class="num">{{ m.sleep }}</td><td class="num">{{ m.sleep_score }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <p class="meta" style="color: var(--muted); font-size: 0.85rem;">
-    Semana vs. baseline 28 días —
-    HRV: {{ wk_vs.hrv }} · FC reposo: {{ wk_vs.rhr }} · Sueño: {{ wk_vs.sleep }}
+  <p style="margin: 0 0 10px; font-size: 0.9rem;">
+    HRV: <strong>{{ wk_vs.hrv }}</strong> · FC reposo: <strong>{{ wk_vs.rhr }}</strong> · Sueño: <strong>{{ wk_vs.sleep }}</strong>
   </p>
+  <details class="data-table">
+    <summary>Ver tabla diaria</summary>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Día</th><th class="num">HRV</th><th class="num">FC reposo</th><th class="num">Sueño</th><th class="num">Puntaje sueño</th><th class="num">Carga</th></tr></thead>
+      <tbody>
+        {% for m in daily_rows %}
+        <tr>
+          <td>{{ m.day }}</td><td class="num">{{ m.hrv }}</td><td class="num">{{ m.rhr }}</td>
+          <td class="num">{{ m.sleep }}</td><td class="num">{{ m.sleep_score }}</td><td class="num">{{ m.load }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </details>
   {% else %}<p class="empty">Sin métricas diarias esta semana.</p>{% endif %}
 </section>
 
 <section>
-  <h2>Bloque actual vs. bloque anterior (28 días)</h2>
+  <h2>Bloque actual vs. bloque anterior <small>28 días</small></h2>
+  <div class="table-wrap">
   <table>
     <thead><tr><th>&nbsp;</th><th class="num">Actual</th><th class="num">Anterior</th><th class="num">Δ</th></tr></thead>
     <tbody>
@@ -116,6 +133,7 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
 </section>
 
 <footer>

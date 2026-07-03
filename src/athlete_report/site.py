@@ -36,12 +36,20 @@ def _archive_entries(paths: ProjectPaths, weeks: list[date]) -> list[dict[str, A
     for week in sorted(weeks, reverse=True)[:ARCHIVE_LIMIT]:
         snapshot = load_snapshot(paths, week)
         meta = load_meta(paths, week)
+        totals = snapshot["report_data"].get("totals", {})
+        fitness = snapshot["report_data"].get("fitness", {})
         entries.append(
             {
                 "week_start": week,
                 "week_end": date.fromisoformat(snapshot["week_end"]),
                 "generated_at": meta.get("generated_at") or snapshot.get("generated_at"),
                 "rebuilt_at": meta.get("rebuilt_at"),
+                "distance_m": totals.get("distance_m"),
+                "duration_s": totals.get("duration_s"),
+                "sessions": totals.get("sessions"),
+                "training_load": totals.get("training_load"),
+                "fitness": fitness.get("fitness_42d"),
+                "fatigue": fitness.get("fatigue_7d"),
             }
         )
     return entries

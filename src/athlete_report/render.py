@@ -3,20 +3,34 @@
 El contenido del reporte sale exclusivamente de report.json. La navegación
 (prev/next/selector) se calcula sobre la lista de semanas disponibles al
 momento de armar el sitio; el contenido de la semana no se recalcula nunca.
+
+Los gráficos son SVG inline generados acá (determinista, sin JS ni CDNs).
+Las coordenadas SVG se redondean a 1 decimal: además de compactar, evita
+falsos positivos del validador de privacidad (pares de decimales largos).
 """
 
 from __future__ import annotations
 
-from datetime import date, datetime
-from typing import Any
+from datetime import date, datetime, timedelta
+from typing import Any, Callable
 
 from jinja2 import Environment, PackageLoader, select_autoescape
+from markupsafe import Markup
 
 MONTHS_ES = [
     "enero", "febrero", "marzo", "abril", "mayo", "junio",
     "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
 ]
 DAYS_ES = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+
+SPORT_LABELS = {
+    "run": "Ruta",
+    "trail_run": "Trail",
+    "indoor_run": "Cinta",
+    "track_run": "Pista",
+    "hike": "Trekking",
+    "strength": "Fuerza",
+}
 
 
 def _env() -> Environment:
@@ -26,6 +40,7 @@ def _env() -> Environment:
     )
 
 
+# ------------------------------------------------------------------ formato
 def fmt_date_long(d: date) -> str:
     return f"{d.day} de {MONTHS_ES[d.month - 1]} de {d.year}"
 
@@ -75,6 +90,13 @@ def _n(value: Any, suffix: str = "") -> str:
     return f"{value}{suffix}"
 
 
+def _num1(value: float) -> str:
+    """Número compacto para etiquetas de gráfico: sin .0 redundante."""
+    if float(value).is_integer():
+        return str(int(value))
+    return f"{value:.1f}"
+
+
 def _sleep_h(seconds: float | None) -> str:
     if seconds is None:
         return "—"
@@ -90,11 +112,145 @@ def _delta_fmt(pct: float | None) -> tuple[str, str]:
 
 
 def _vs_baseline(week_val: float | None, base_val: float | None, fmt) -> str:
-    wk = fmt(week_val)
-    base = fmt(base_val)
-    return f"{wk} (baseline {base})"
+    return f"{fmt(week_val)} (baseline {fmt(base_val)})"
 
 
+# ------------------------------------------------------------------- charts
+CHART_W = 600
+CHART_H = 190
+PAD_TOP = 22
+PAD_BOTTOM = 26
+PAD_X = 8
+
+
+def _plot_area() -> tuple[float, float]:
+    return CHART_H - PAD_TOP - PAD_BOTTOM, CHART_W - 2 * PAD_X
+
+
+def _svg_open(title: str) -> str:
+    return (
+        f'<svg class="chart" viewBox="0 0 {CHART_W} {CHART_H}" role="img" '
+        f'aria-label="{title}" preserveAspectRatio="xMidYMid meet">'
+    )
+
+
+def _baseline_svg(y: float) -> str:
+    # sólo línea punteada; el subtítulo del gráfico explica qué es
+    return f'<line x1="{PAD_X}" y1="{y:.1f}" x2="{CHART_W - PAD_X}" y2="{y:.1f}" class="chart-baseline"/>'
+
+
+def bar_chart(
+    points: list[tuple[str, float | None]],
+    *,
+    title: str,
+    value_fmt: Callable[[float], str] = _num1,
+    baseline: float | None = None,
+) -> Markup | None:
+    """Barras por día. points: [(etiqueta, valor|None)]. None = sin barra."""
+    values = [v for _, v in points if v is not None]
+    if not values:
+        return None
+    plot_h, plot_w = _plot_area()
+    vmax = max(max(values), baseline or 0) or 1
+    slot = plot_w / len(points)
+    bar_w = slot * 0.6
+    parts = [_svg_open(title)]
+    for i, (label, value) in enumerate(points):
+        cx = PAD_X + slot * i + slot / 2
+        parts.append(
+            f'<text x="{cx:.1f}" y="{CHART_H - 8}" class="chart-axis" text-anchor="middle">{label}</text>'
+        )
+        if value is None:
+            continue
+        h = value / vmax * plot_h
+        y = PAD_TOP + plot_h - h
+        parts.append(
+            f'<rect x="{cx - bar_w / 2:.1f}" y="{y:.1f}" width="{bar_w:.1f}" height="{h:.1f}" rx="4" class="chart-bar"/>'
+            f'<text x="{cx:.1f}" y="{y - 5:.1f}" class="chart-value" text-anchor="middle">{value_fmt(value)}</text>'
+        )
+    if baseline is not None and baseline > 0:
+        y = PAD_TOP + plot_h - (baseline / vmax * plot_h)
+        parts.append(_baseline_svg(y))
+    parts.append("</svg>")
+    return Markup("".join(parts))
+
+
+def line_chart(
+    points: list[tuple[str, float | None]],
+    *,
+    title: str,
+    value_fmt: Callable[[float], str] = _num1,
+    baseline: float | None = None,
+    series2: list[float | None] | None = None,
+    legend: tuple[str, str] | None = None,
+) -> Markup | None:
+    """Línea por día (con serie secundaria opcional). None = hueco."""
+    values = [v for _, v in points if v is not None]
+    extra = [v for v in (series2 or []) if v is not None]
+    if not values:
+        return None
+    plot_h, plot_w = _plot_area()
+    all_vals = values + extra + ([baseline] if baseline is not None else [])
+    vmin, vmax = min(all_vals), max(all_vals)
+    span = (vmax - vmin) or 1
+    vmin -= span * 0.15
+    vmax += span * 0.15
+    slot = plot_w / len(points)
+
+    def xy(i: int, v: float) -> tuple[float, float]:
+        x = PAD_X + slot * i + slot / 2
+        y = PAD_TOP + (vmax - v) / (vmax - vmin) * plot_h
+        return x, y
+
+    def series_svg(vals: list[float | None], cls: str, with_labels: bool) -> str:
+        segs, seg = [], []
+        for i, v in enumerate(vals):
+            if v is None:
+                if seg:
+                    segs.append(seg)
+                    seg = []
+                continue
+            seg.append(xy(i, v))
+        if seg:
+            segs.append(seg)
+        out = []
+        for s in segs:
+            if len(s) > 1:
+                pts = " ".join(f"{x:.1f},{y:.1f}" for x, y in s)
+                out.append(f'<polyline points="{pts}" class="{cls}"/>')
+            for x, y in s:
+                out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" class="{cls}-dot"/>')
+        if with_labels:
+            for i, v in enumerate(vals):
+                if v is not None:
+                    x, y = xy(i, v)
+                    out.append(
+                        f'<text x="{x:.1f}" y="{y - 8:.1f}" class="chart-value" text-anchor="middle">{value_fmt(v)}</text>'
+                    )
+        return "".join(out)
+
+    parts = [_svg_open(title)]
+    for i, (label, _) in enumerate(points):
+        cx = PAD_X + slot * i + slot / 2
+        parts.append(
+            f'<text x="{cx:.1f}" y="{CHART_H - 8}" class="chart-axis" text-anchor="middle">{label}</text>'
+        )
+    if baseline is not None:
+        y = PAD_TOP + (vmax - baseline) / (vmax - vmin) * plot_h
+        parts.append(_baseline_svg(y))
+    if series2 is not None:
+        parts.append(series_svg(list(series2), "chart-line2", False))
+    parts.append(series_svg([v for _, v in points], "chart-line", True))
+    if legend:
+        parts.append(
+            f'<text x="{PAD_X}" y="12" class="chart-legend"><tspan class="legend1">● {legend[0]}</tspan>'
+            f'  <tspan class="legend2">● {legend[1]}</tspan></text>'
+        )
+    parts.append("</svg>")
+    return Markup("".join(parts))
+
+
+# --------------------------------------------------------------- navegación
 def build_nav(all_weeks: list[date], current: date) -> dict[str, Any]:
     """all_weeks ascendente; opciones del selector descendentes."""
     ordered = sorted(all_weeks)
@@ -111,50 +267,93 @@ def build_nav(all_weeks: list[date], current: date) -> dict[str, Any]:
     }
 
 
+# ------------------------------------------------------------------ reporte
+def _day_label(d: date) -> str:
+    return f"{DAYS_ES[d.weekday()][:3].capitalize()} {d.day}"
+
+
+def _week_days(week_start: date) -> list[date]:
+    return [week_start + timedelta(days=i) for i in range(7)]
+
+
 def render_report(snapshot: dict[str, Any], nav: dict[str, Any], meta: dict[str, Any] | None = None) -> str:
     week_start = date.fromisoformat(snapshot["week_start"])
     week_end = date.fromisoformat(snapshot["week_end"])
     rd = snapshot["report_data"]
     totals = rd["totals"]
     fit = rd["fitness"]
-
-    def day_label(iso: str) -> str:
-        d = date.fromisoformat(iso)
-        return f"{DAYS_ES[d.weekday()][:3].capitalize()} {d.day}"
+    days = _week_days(week_start)
 
     activities = [
         {
-            "day": day_label(a["date"]) if a.get("date") else "—",
+            "day": _day_label(date.fromisoformat(a["date"])) if a.get("date") else "—",
             "name": a.get("name") or "Actividad",
-            "sport": a.get("sport") or "—",
+            "sport": a.get("sport") or "otro",
+            "sport_label": SPORT_LABELS.get(a.get("sport") or "", (a.get("sport") or "—").replace("_", " ")),
             "duration": fmt_duration(a.get("duration_s")),
-            "distance": fmt_km(a.get("distance_m")),
+            "distance": fmt_km(a.get("distance_m")) if a.get("distance_m") is not None else "—",
             "avg_hr": _n(a.get("avg_hr")),
             "load": _n(a.get("training_load")),
         }
         for a in rd["activities"]
     ]
 
+    # series diarias sobre los 7 días de la semana
+    daily_by_date = {m["date"]: m for m in rd["daily"]}
     load_by_day = rd.get("load_by_day", {})
-    max_load = max(load_by_day.values(), default=0) or 1
-    daily_load = [
-        {"day": day_label(d), "load": _n(v), "pct": round(v / max_load * 100)}
-        for d, v in sorted(load_by_day.items())
-    ]
+    dist_by_day: dict[str, float] = {}
+    for a in rd["activities"]:
+        if a.get("date") and a.get("distance_m"):
+            dist_by_day[a["date"]] = dist_by_day.get(a["date"], 0.0) + a["distance_m"] / 1000
+
+    def day_points(getter: Callable[[date], float | None]) -> list[tuple[str, float | None]]:
+        return [(_day_label(d), getter(d)) for d in days]
+
+    base = rd["baselines_28d"]
+    wk = rd["week_averages"]
+
+    charts = {
+        "load": bar_chart(
+            day_points(lambda d: load_by_day.get(d.isoformat())),
+            title="Carga de entrenamiento por día",
+        ),
+        "distance": bar_chart(
+            day_points(lambda d: dist_by_day.get(d.isoformat())),
+            title="Distancia por día (km)",
+        ),
+        "hrv": line_chart(
+            day_points(lambda d: (daily_by_date.get(d.isoformat()) or {}).get("hrv")),
+            title="HRV nocturno (ms)",
+            baseline=base.get("hrv"),
+        ),
+        "sleep": bar_chart(
+            day_points(
+                lambda d: (
+                    v / 3600 if (v := (daily_by_date.get(d.isoformat()) or {}).get("sleep_duration_s")) else None
+                )
+            ),
+            title="Horas de sueño por día",
+            baseline=(base["sleep_duration_s"] / 3600) if base.get("sleep_duration_s") else None,
+        ),
+        "rhr": line_chart(
+            day_points(lambda d: (daily_by_date.get(d.isoformat()) or {}).get("rhr")),
+            title="Frecuencia cardíaca en reposo (ppm)",
+            baseline=base.get("rhr"),
+        ),
+    }
 
     daily_rows = [
         {
-            "day": day_label(m["date"]),
+            "day": _day_label(date.fromisoformat(m["date"])),
             "hrv": _n(m.get("hrv")),
             "rhr": _n(m.get("rhr")),
             "sleep": _sleep_h(m.get("sleep_duration_s")),
             "sleep_score": _n(m.get("sleep_score")),
+            "load": _n(load_by_day.get(m["date"])),
         }
         for m in rd["daily"]
     ]
 
-    base = rd["baselines_28d"]
-    wk = rd["week_averages"]
     wk_vs = {
         "hrv": _vs_baseline(wk.get("hrv"), base.get("hrv"), _n),
         "rhr": _vs_baseline(wk.get("rhr"), base.get("rhr"), _n),
@@ -209,9 +408,11 @@ def render_report(snapshot: dict[str, Any], nav: dict[str, Any], meta: dict[str,
             "fitness": _n(fit.get("fitness_42d")),
             "fatigue": _n(fit.get("fatigue_7d")),
             "form": _n(fit.get("form")),
+            "status": fit.get("status"),
         },
         activities=activities,
-        daily_load=daily_load,
+        charts=charts,
+        has_charts=any(charts.values()),
         daily_rows=daily_rows,
         wk_vs=wk_vs,
         block_rows=block_rows,
@@ -221,19 +422,45 @@ def render_report(snapshot: dict[str, Any], nav: dict[str, Any], meta: dict[str,
     )
 
 
+# ------------------------------------------------------------------ archivo
 def render_archive(entries: list[dict[str, Any]], latest: date) -> str:
-    """entries: [{week_start: date, generated_at: iso, rebuilt_at: iso|None}] desc."""
-    template = _env().get_template("archive.html.j2")
+    """entries desc: [{week_start, week_end, generated_at, rebuilt_at,
+    distance_m, duration_s, sessions, training_load, fitness, fatigue}]."""
+    asc = list(reversed(entries))
+
+    def short(e: dict[str, Any]) -> str:
+        return f"{e['week_start'].day}/{e['week_start'].month}"
+
+    trend_distance = bar_chart(
+        [(short(e), (e["distance_m"] / 1000) if e.get("distance_m") else None) for e in asc],
+        title="Distancia semanal (km)",
+    )
+    trend_fitness = line_chart(
+        [(short(e), e.get("fitness")) for e in asc],
+        title="Fitness y fatiga por semana",
+        series2=[e.get("fatigue") for e in asc],
+        legend=("Fitness (42 d)", "Fatiga (7 d)"),
+    )
+
     view = [
         {
             "value": e["week_start"].isoformat(),
             "label": fmt_week_title(e["week_start"], e["week_end"]),
             "generated_on": _fmt_ts_date(e.get("generated_at")),
             "rebuilt_on": _fmt_ts_date(e["rebuilt_at"]) if e.get("rebuilt_at") else None,
+            "distance": fmt_km(e.get("distance_m")) if e.get("distance_m") else None,
+            "duration": fmt_duration(e.get("duration_s")) if e.get("duration_s") else None,
+            "sessions": e.get("sessions"),
         }
         for e in entries
     ]
-    return template.render(entries=view, latest=latest.isoformat())
+    template = _env().get_template("archive.html.j2")
+    return template.render(
+        entries=view,
+        latest=latest.isoformat(),
+        trend_distance=trend_distance,
+        trend_fitness=trend_fitness,
+    )
 
 
 def render_redirect(latest: date) -> str:
