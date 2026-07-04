@@ -24,8 +24,9 @@ def test_archivo_incluye_tendencias(paths):
     cmd_generate(paths, date(2026, 6, 15), provider=provider, now=NOW)
     cmd_publish(paths, provider=provider, now=NOW)
     html = (paths.dist / "archive" / "index.html").read_text()
-    assert "Tendencias" in html
-    assert html.count("<svg") >= 2
+    assert "Evolución semana a semana" in html
+    # distancia, desnivel, carga, fitness/fatiga, HRV, FC reposo, sueño, tiempo
+    assert html.count("<svg") >= 7
 
 
 def test_semana_sin_carga_ni_hrv_no_rompe(paths):

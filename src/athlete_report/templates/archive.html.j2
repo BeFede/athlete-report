@@ -23,16 +23,13 @@
   <a href="../reports/{{ latest }}/">Última semana</a>
 </nav>
 
-{% if trend_distance or trend_fitness %}
+{% if trends %}
 <section>
-  <h2>Tendencias</h2>
+  <h2>Evolución semana a semana</h2>
   <div class="charts">
-    {% if trend_distance %}
-    <div class="chart-card"><h3>Distancia semanal</h3><p class="sub">km por semana</p>{{ trend_distance }}</div>
-    {% endif %}
-    {% if trend_fitness %}
-    <div class="chart-card"><h3>Fitness y fatiga</h3><p class="sub">al cierre de cada semana</p>{{ trend_fitness }}</div>
-    {% endif %}
+    {% for t in trends %}
+    <div class="chart-card"><h3>{{ t.title }}</h3><p class="sub">{{ t.sub }}</p>{{ t.svg }}</div>
+    {% endfor %}
   </div>
 </section>
 {% endif %}

@@ -230,6 +230,24 @@ class Store:
             ingested_at,
         )
 
+    # --------------------------------------------------------------- details
+    def _detail_path(self, provider: str, external_id: str) -> Path:
+        return self.paths.normalized / "details" / provider / f"{external_id}.json"
+
+    def save_detail(self, provider: str, external_id: str, detail: dict[str, Any]) -> None:
+        path = self._detail_path(provider, external_id)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(detail, indent=1, ensure_ascii=False))
+
+    def load_detail(self, provider: str, external_id: str) -> dict[str, Any] | None:
+        path = self._detail_path(provider, external_id)
+        if not path.exists():
+            return None
+        return json.loads(path.read_text())
+
+    def has_detail(self, provider: str, external_id: str) -> bool:
+        return self._detail_path(provider, external_id).exists()
+
     # ------------------------------------------------------------ sync state
     def read_sync_state(self) -> dict[str, Any]:
         if not self.paths.sync_state.exists():

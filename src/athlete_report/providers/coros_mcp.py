@@ -96,9 +96,13 @@ class CorosMcpProvider:
 
     def __init__(self, raw_dir: Path):
         self.raw_dir = raw_dir
+        self._cache: dict[str, list[dict[str, Any]]] = {}
+        self._detail_index: dict[str, dict[str, Any]] | None = None
 
     # ------------------------------------------------------------------ raw
     def _items(self, kind: str) -> list[dict[str, Any]]:
+        if kind in self._cache:
+            return self._cache[kind]
         if not self.raw_dir.exists():
             return []
         items: list[dict[str, Any]] = []
@@ -111,6 +115,7 @@ class CorosMcpProvider:
                 batch = payload.get("items") or []
                 if isinstance(batch, list):
                     items.extend(i for i in batch if isinstance(i, dict))
+        self._cache[kind] = items
         return items
 
     # ------------------------------------------------------------ interface
@@ -141,11 +146,16 @@ class CorosMcpProvider:
         return [by_date[d] for d in sorted(by_date)]
 
     def fetch_activity_detail(self, activity_id: str) -> RawActivityDetail | None:
-        for item in self._items("activity_detail"):
-            ext_id = _first(item, "external_activity_id", "activity_id", "activityId", "labelId", "id")
-            if ext_id is not None and str(ext_id) == str(activity_id):
-                return RawActivityDetail(provider=PROVIDER, external_activity_id=str(ext_id), payload=item)
-        return None
+        if self._detail_index is None:
+            self._detail_index = {}
+            for item in self._items("activity_detail"):
+                ext_id = _first(item, "external_activity_id", "activity_id", "activityId", "labelId", "id")
+                if ext_id is not None:
+                    self._detail_index[str(ext_id)] = item  # último dump gana
+        item = self._detail_index.get(str(activity_id))
+        if item is None:
+            return None
+        return RawActivityDetail(provider=PROVIDER, external_activity_id=str(activity_id), payload=item)
 
     # -------------------------------------------------------------- mapping
     def _map_activity(self, item: dict[str, Any]) -> RawActivity | None:

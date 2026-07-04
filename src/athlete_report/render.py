@@ -103,6 +103,24 @@ def _sleep_h(seconds: float | None) -> str:
     return f"{seconds / 3600:.1f} h"
 
 
+def fmt_pace(seconds: float | None) -> str:
+    if not seconds:
+        return "—"
+    total = int(round(seconds))
+    return f"{total // 60}:{total % 60:02d}"
+
+
+def _elev(gain: float | None, loss: float | None = None) -> str:
+    if gain is None and loss is None:
+        return "—"
+    parts = []
+    if gain is not None:
+        parts.append(f"+{int(round(gain))}")
+    if loss is not None:
+        parts.append(f"-{int(round(loss))}")
+    return "/".join(parts) + " m"
+
+
 def _delta_fmt(pct: float | None) -> tuple[str, str]:
     if pct is None:
         return "—", ""
@@ -276,6 +294,65 @@ def _week_days(week_start: date) -> list[date]:
     return [week_start + timedelta(days=i) for i in range(7)]
 
 
+def _splits_view(splits: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    paces = [s["pace_s"] for s in splits if s.get("pace_s")]
+    fastest = min(paces) if paces else None
+    rows = []
+    for s in splits:
+        pace = s.get("pace_s")
+        km = s.get("km")
+        dist = s.get("distance_m") or 0
+        label = str(km) if dist >= 950 else f"{dist / 1000:.2f}".rstrip("0").rstrip(".")
+        rows.append(
+            {
+                "km": label,
+                "pace": fmt_pace(pace),
+                # barra proporcional a la velocidad: el km más rápido llena el ancho
+                "pct": round(fastest / pace * 100) if (pace and fastest) else 0,
+                "fastest": pace is not None and pace == fastest,
+                "hr": _n(s.get("avg_hr")),
+                "elev": _elev(s.get("elev_gain_m"), s.get("elev_loss_m")),
+            }
+        )
+    return rows
+
+
+def _activity_view(a: dict[str, Any]) -> dict[str, Any]:
+    det = a.get("detail") or {}
+    load = a.get("training_load") if a.get("training_load") is not None else det.get("training_load")
+    elev_gain = a.get("elevation_gain_m") if a.get("elevation_gain_m") is not None else det.get("elevation_gain_m")
+
+    stats = []
+    for label, value in (
+        ("Carga", _n(load)),
+        ("Desnivel", _elev(elev_gain, det.get("elevation_loss_m")) if elev_gain is not None else "—"),
+        ("TE aeróbico", _n(det.get("aerobic_te"))),
+        ("TE anaeróbico", _n(det.get("anaerobic_te"))),
+        ("Potencia media", _n(det.get("avg_power_w"), " W")),
+        ("Cadencia", _n(det.get("avg_cadence_spm"), " spm")),
+        ("Ritmo ajustado", fmt_pace(det.get("adjusted_pace_s")) + (" /km" if det.get("adjusted_pace_s") else "")),
+        ("Mejor km", fmt_pace(det.get("best_km_s")) + (" /km" if det.get("best_km_s") else "")),
+        ("Foco", det.get("training_focus") or "—"),
+    ):
+        if value not in ("—", ""):
+            stats.append({"label": label, "value": value})
+
+    return {
+        "day": _day_label(date.fromisoformat(a["date"])) if a.get("date") else "—",
+        "name": a.get("name") or "Actividad",
+        "sport": a.get("sport") or "otro",
+        "sport_label": SPORT_LABELS.get(a.get("sport") or "", (a.get("sport") or "—").replace("_", " ")),
+        "duration": fmt_duration(a.get("duration_s")),
+        "distance": fmt_km(a.get("distance_m")) if a.get("distance_m") is not None else "—",
+        "avg_hr": _n(a.get("avg_hr")),
+        "load": _n(load),
+        "elev": _elev(elev_gain) if elev_gain is not None else "—",
+        "has_detail": bool(det),
+        "stats": stats,
+        "splits": _splits_view(det.get("splits") or []),
+    }
+
+
 def render_report(snapshot: dict[str, Any], nav: dict[str, Any], meta: dict[str, Any] | None = None) -> str:
     week_start = date.fromisoformat(snapshot["week_start"])
     week_end = date.fromisoformat(snapshot["week_end"])
@@ -284,19 +361,7 @@ def render_report(snapshot: dict[str, Any], nav: dict[str, Any], meta: dict[str,
     fit = rd["fitness"]
     days = _week_days(week_start)
 
-    activities = [
-        {
-            "day": _day_label(date.fromisoformat(a["date"])) if a.get("date") else "—",
-            "name": a.get("name") or "Actividad",
-            "sport": a.get("sport") or "otro",
-            "sport_label": SPORT_LABELS.get(a.get("sport") or "", (a.get("sport") or "—").replace("_", " ")),
-            "duration": fmt_duration(a.get("duration_s")),
-            "distance": fmt_km(a.get("distance_m")) if a.get("distance_m") is not None else "—",
-            "avg_hr": _n(a.get("avg_hr")),
-            "load": _n(a.get("training_load")),
-        }
-        for a in rd["activities"]
-    ]
+    activities = [_activity_view(a) for a in rd["activities"]]
 
     # series diarias sobre los 7 días de la semana
     daily_by_date = {m["date"]: m for m in rd["daily"]}
@@ -403,6 +468,7 @@ def render_report(snapshot: dict[str, Any], nav: dict[str, Any], meta: dict[str,
             "duration": fmt_duration(totals.get("duration_s")),
             "distance": fmt_km(totals.get("distance_m")),
             "load": _n(totals.get("training_load")),
+            "elevation": _elev(totals.get("elevation_gain_m")) if totals.get("elevation_gain_m") else "—",
         },
         fitness={
             "fitness": _n(fit.get("fitness_42d")),
@@ -431,16 +497,63 @@ def render_archive(entries: list[dict[str, Any]], latest: date) -> str:
     def short(e: dict[str, Any]) -> str:
         return f"{e['week_start'].day}/{e['week_start'].month}"
 
-    trend_distance = bar_chart(
-        [(short(e), (e["distance_m"] / 1000) if e.get("distance_m") else None) for e in asc],
-        title="Distancia semanal (km)",
-    )
-    trend_fitness = line_chart(
-        [(short(e), e.get("fitness")) for e in asc],
-        title="Fitness y fatiga por semana",
-        series2=[e.get("fatigue") for e in asc],
-        legend=("Fitness (42 d)", "Fatiga (7 d)"),
-    )
+    def pts(getter: Callable[[dict[str, Any]], float | None]) -> list[tuple[str, float | None]]:
+        return [(short(e), getter(e)) for e in asc]
+
+    trends = [
+        {
+            "title": "Distancia semanal",
+            "sub": "km por semana",
+            "svg": bar_chart(pts(lambda e: e["distance_m"] / 1000 if e.get("distance_m") else None), title="Distancia semanal (km)"),
+        },
+        {
+            "title": "Desnivel acumulado",
+            "sub": "m de subida por semana",
+            "svg": bar_chart(pts(lambda e: e.get("elevation_gain_m")), title="Desnivel semanal (m)", value_fmt=lambda v: str(int(round(v)))),
+        },
+        {
+            "title": "Carga semanal",
+            "sub": "training load total por semana",
+            "svg": bar_chart(pts(lambda e: e.get("training_load")), title="Carga semanal", value_fmt=lambda v: str(int(round(v)))),
+        },
+        {
+            "title": "Fitness y fatiga",
+            "sub": "al cierre de cada semana",
+            "svg": line_chart(
+                pts(lambda e: e.get("fitness")),
+                title="Fitness y fatiga por semana",
+                series2=[e.get("fatigue") for e in asc],
+                legend=("Fitness (42 d)", "Fatiga (7 d)"),
+            ),
+        },
+        {
+            "title": "HRV nocturno",
+            "sub": "promedio semanal (ms)",
+            "svg": line_chart(pts(lambda e: e.get("hrv")), title="HRV promedio semanal (ms)"),
+        },
+        {
+            "title": "FC en reposo",
+            "sub": "promedio semanal (ppm)",
+            "svg": line_chart(pts(lambda e: e.get("rhr")), title="FC en reposo promedio semanal (ppm)"),
+        },
+        {
+            "title": "Sueño",
+            "sub": "horas promedio por noche",
+            "svg": bar_chart(
+                pts(lambda e: e["sleep_duration_s"] / 3600 if e.get("sleep_duration_s") else None),
+                title="Sueño promedio semanal (horas)",
+            ),
+        },
+        {
+            "title": "Tiempo de entrenamiento",
+            "sub": "horas por semana",
+            "svg": bar_chart(
+                pts(lambda e: e["duration_s"] / 3600 if e.get("duration_s") else None),
+                title="Horas de entrenamiento por semana",
+            ),
+        },
+    ]
+    trends = [t for t in trends if t["svg"]]
 
     view = [
         {
@@ -455,12 +568,7 @@ def render_archive(entries: list[dict[str, Any]], latest: date) -> str:
         for e in entries
     ]
     template = _env().get_template("archive.html.j2")
-    return template.render(
-        entries=view,
-        latest=latest.isoformat(),
-        trend_distance=trend_distance,
-        trend_fitness=trend_fitness,
-    )
+    return template.render(entries=view, latest=latest.isoformat(), trends=trends)
 
 
 def render_redirect(latest: date) -> str:

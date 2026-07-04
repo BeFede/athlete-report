@@ -38,6 +38,7 @@ def _archive_entries(paths: ProjectPaths, weeks: list[date]) -> list[dict[str, A
         meta = load_meta(paths, week)
         totals = snapshot["report_data"].get("totals", {})
         fitness = snapshot["report_data"].get("fitness", {})
+        week_avg = snapshot["report_data"].get("week_averages", {})
         entries.append(
             {
                 "week_start": week,
@@ -48,8 +49,12 @@ def _archive_entries(paths: ProjectPaths, weeks: list[date]) -> list[dict[str, A
                 "duration_s": totals.get("duration_s"),
                 "sessions": totals.get("sessions"),
                 "training_load": totals.get("training_load"),
+                "elevation_gain_m": totals.get("elevation_gain_m"),
                 "fitness": fitness.get("fitness_42d"),
                 "fatigue": fitness.get("fatigue_7d"),
+                "hrv": week_avg.get("hrv"),
+                "rhr": week_avg.get("rhr"),
+                "sleep_duration_s": week_avg.get("sleep_duration_s"),
             }
         )
     return entries

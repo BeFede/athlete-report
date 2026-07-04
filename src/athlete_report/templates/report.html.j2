@@ -42,6 +42,7 @@
   <div class="card accent"><div class="label">Sesiones</div><div class="value">{{ totals.sessions }}</div></div>
   <div class="card accent"><div class="label">Tiempo</div><div class="value">{{ totals.duration }}</div></div>
   <div class="card accent"><div class="label">Distancia</div><div class="value">{{ totals.distance }}</div></div>
+  <div class="card accent"><div class="label">Desnivel</div><div class="value">{{ totals.elevation }}</div></div>
   <div class="card accent"><div class="label">Carga semanal</div><div class="value">{{ totals.load }}</div></div>
   <div class="card"><div class="label">Fitness</div><div class="value">{{ fitness.fitness }}</div><div class="sub">carga 42 días</div></div>
   <div class="card"><div class="label">Fatiga</div><div class="value">{{ fitness.fatigue }}</div><div class="sub">carga 7 días</div></div>
@@ -49,24 +50,55 @@
 </div>
 
 <section>
-  <h2>Actividades</h2>
+  <h2>Actividades <small>tocá una para ver el detalle</small></h2>
   {% if activities %}
-  <div class="table-wrap">
-  <table>
-    <thead>
-      <tr><th>Día</th><th>Actividad</th><th>Deporte</th><th class="num">Tiempo</th><th class="num">Distancia</th><th class="num">FC media</th><th class="num">Carga</th></tr>
-    </thead>
-    <tbody>
-      {% for a in activities %}
-      <tr>
-        <td>{{ a.day }}</td><td>{{ a.name }}</td>
-        <td><span class="chip {{ a.sport }}">{{ a.sport_label }}</span></td>
-        <td class="num">{{ a.duration }}</td><td class="num">{{ a.distance }}</td>
-        <td class="num">{{ a.avg_hr }}</td><td class="num">{{ a.load }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="activity-list">
+    <div class="activity-head">
+      <span>Día</span><span>Actividad</span><span class="num">Tiempo</span><span class="num">Distancia</span><span class="num">FC</span><span class="num">Carga</span><span class="num">Desnivel</span><span></span>
+    </div>
+    {% for a in activities %}
+    <details class="activity" {% if not a.has_detail %}data-empty="1"{% endif %}>
+      <summary>
+        <span class="a-day">{{ a.day }}</span>
+        <span class="a-name">{{ a.name }} <span class="chip {{ a.sport }}">{{ a.sport_label }}</span></span>
+        <span class="num">{{ a.duration }}</span>
+        <span class="num">{{ a.distance }}</span>
+        <span class="num">{{ a.avg_hr }}</span>
+        <span class="num">{{ a.load }}</span>
+        <span class="num">{{ a.elev }}</span>
+        <span class="a-chevron">{% if a.has_detail %}&#9662;{% endif %}</span>
+      </summary>
+      {% if a.has_detail %}
+      <div class="a-detail">
+        {% if a.stats %}
+        <div class="a-stats">
+          {% for s in a.stats %}
+          <div class="a-stat"><span class="label">{{ s.label }}</span><span class="value">{{ s.value }}</span></div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if a.splits %}
+        <div class="table-wrap">
+        <table class="splits">
+          <thead><tr><th>Km</th><th>Ritmo</th><th style="width:38%">&nbsp;</th><th class="num">FC</th><th class="num">Desnivel</th></tr></thead>
+          <tbody>
+            {% for s in a.splits %}
+            <tr>
+              <td>{{ s.km }}</td>
+              <td class="num{% if s.fastest %} fastest{% endif %}">{{ s.pace }}</td>
+              <td><div class="split-bar"><i style="width: {{ s.pct }}%"></i></div></td>
+              <td class="num">{{ s.hr }}</td>
+              <td class="num">{{ s.elev }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </details>
+    {% endfor %}
   </div>
   {% else %}<p class="empty">Sin actividades registradas esta semana.</p>{% endif %}
 </section>

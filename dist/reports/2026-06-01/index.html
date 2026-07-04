@@ -156,6 +156,55 @@ svg.chart { width: 100%; height: auto; display: block; }
 details.data-table { margin-top: 12px; }
 details.data-table summary { cursor: pointer; color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
 
+/* ---------------------------------------------------- actividades expand */
+.activity-list { display: grid; gap: 8px; }
+.activity-head, details.activity summary {
+  display: grid;
+  grid-template-columns: 64px 1fr 84px 78px 44px 56px 84px 20px;
+  gap: 8px; align-items: center;
+}
+.activity-head {
+  padding: 4px 16px; color: var(--muted); font-size: 0.72rem;
+  text-transform: uppercase; letter-spacing: 0.05em; font-weight: 650;
+}
+.activity-head .num { text-align: right; }
+details.activity {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: var(--shadow); overflow: hidden;
+}
+details.activity summary {
+  padding: 12px 16px; cursor: pointer; list-style: none; font-size: 0.88rem;
+}
+details.activity summary::-webkit-details-marker { display: none; }
+details.activity[data-empty] summary { cursor: default; }
+details.activity summary:hover { background: color-mix(in srgb, var(--accent-soft) 40%, transparent); }
+details.activity summary .num { text-align: right; font-variant-numeric: tabular-nums; }
+details.activity summary .a-name { font-weight: 650; min-width: 0; }
+details.activity summary .a-day { color: var(--muted); }
+details.activity summary .a-chevron { color: var(--accent); transition: transform 0.15s; text-align: center; }
+details.activity[open] summary .a-chevron { transform: rotate(180deg); }
+details.activity[open] summary { border-bottom: 1px solid var(--border); }
+.a-detail { padding: 14px 16px 16px; }
+.a-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.a-stat { background: var(--accent-soft); border-radius: 10px; padding: 8px 10px; }
+.a-stat .label { display: block; color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 650; }
+.a-stat .value { font-weight: 700; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+table.splits { font-size: 0.84rem; }
+table.splits td.fastest { color: var(--good); font-weight: 750; }
+.split-bar { background: var(--accent-soft); border-radius: 4px; height: 10px; position: relative; min-width: 50px; }
+.split-bar > i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 4px; display: block; }
+@media (max-width: 700px) {
+  .activity-head { display: none; }
+  .activity-head + details.activity { border-top: none; }
+  details.activity summary {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 2px;
+  }
+  details.activity summary .a-name { grid-column: 1 / -1; }
+  details.activity summary .num { text-align: left; color: var(--muted); }
+  details.activity summary .a-chevron { display: none; }
+}
+
 /* --------------------------------------------------------------- archivo */
 .archive-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
 .archive-list li {
@@ -177,8 +226,8 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
   <div class="wrap">
     <p class="kicker">Reporte semanal de entrenamiento</p>
     <h1>Semana del 1 al 7 de junio de 2026</h1>
-    <p class="meta">Generado el 3 de julio de 2026</p>
-    <p class="meta">Datos sincronizados hasta el 3 de julio de 2026</p>
+    <p class="meta">Generado el 4 de julio de 2026</p>
+    <p class="meta">Datos sincronizados hasta el 4 de julio de 2026</p>
     
     <span class="badge">Estado COROS: Optimized</span>
   </div>
@@ -227,6 +276,7 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
   <div class="card accent"><div class="label">Sesiones</div><div class="value">8</div></div>
   <div class="card accent"><div class="label">Tiempo</div><div class="value">9 h 03 min</div></div>
   <div class="card accent"><div class="label">Distancia</div><div class="value">79.1 km</div></div>
+  <div class="card accent"><div class="label">Desnivel</div><div class="value">—</div></div>
   <div class="card accent"><div class="label">Carga semanal</div><div class="value">—</div></div>
   <div class="card"><div class="label">Fitness</div><div class="value">163</div><div class="sub">carga 42 días</div></div>
   <div class="card"><div class="label">Fatiga</div><div class="value">196</div><div class="sub">carga 7 días</div></div>
@@ -234,73 +284,125 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
 </div>
 
 <section>
-  <h2>Actividades</h2>
+  <h2>Actividades <small>tocá una para ver el detalle</small></h2>
   
-  <div class="table-wrap">
-  <table>
-    <thead>
-      <tr><th>Día</th><th>Actividad</th><th>Deporte</th><th class="num">Tiempo</th><th class="num">Distancia</th><th class="num">FC media</th><th class="num">Carga</th></tr>
-    </thead>
-    <tbody>
+  <div class="activity-list">
+    <div class="activity-head">
+      <span>Día</span><span>Actividad</span><span class="num">Tiempo</span><span class="num">Distancia</span><span class="num">FC</span><span class="num">Carga</span><span class="num">Desnivel</span><span></span>
+    </div>
+    
+    <details class="activity" data-empty="1">
+      <summary>
+        <span class="a-day">Lun 1</span>
+        <span class="a-name">Outdoor Run — Colón Carrera <span class="chip run">Ruta</span></span>
+        <span class="num">1 h 06 min</span>
+        <span class="num">12.4 km</span>
+        <span class="num">133</span>
+        <span class="num">—</span>
+        <span class="num">—</span>
+        <span class="a-chevron"></span>
+      </summary>
       
-      <tr>
-        <td>Lun 1</td><td>Outdoor Run — Colón Carrera</td>
-        <td><span class="chip run">Ruta</span></td>
-        <td class="num">1 h 06 min</td><td class="num">12.4 km</td>
-        <td class="num">133</td><td class="num">—</td>
-      </tr>
+    </details>
+    
+    <details class="activity" data-empty="1">
+      <summary>
+        <span class="a-day">Mar 2</span>
+        <span class="a-name">Trail Run — Colón Trail <span class="chip trail_run">Trail</span></span>
+        <span class="num">55 min</span>
+        <span class="num">10.5 km</span>
+        <span class="num">141</span>
+        <span class="num">—</span>
+        <span class="num">—</span>
+        <span class="a-chevron"></span>
+      </summary>
       
-      <tr>
-        <td>Mar 2</td><td>Trail Run — Colón Trail</td>
-        <td><span class="chip trail_run">Trail</span></td>
-        <td class="num">55 min</td><td class="num">10.5 km</td>
-        <td class="num">141</td><td class="num">—</td>
-      </tr>
+    </details>
+    
+    <details class="activity" data-empty="1">
+      <summary>
+        <span class="a-day">Mar 2</span>
+        <span class="a-name">Strength — Fuerza <span class="chip strength">Fuerza</span></span>
+        <span class="num">1 h 19 min</span>
+        <span class="num">—</span>
+        <span class="num">115</span>
+        <span class="num">—</span>
+        <span class="num">—</span>
+        <span class="a-chevron"></span>
+      </summary>
       
-      <tr>
-        <td>Mar 2</td><td>Strength — Fuerza</td>
-        <td><span class="chip strength">Fuerza</span></td>
-        <td class="num">1 h 19 min</td><td class="num">—</td>
-        <td class="num">115</td><td class="num">—</td>
-      </tr>
+    </details>
+    
+    <details class="activity" data-empty="1">
+      <summary>
+        <span class="a-day">Mié 3</span>
+        <span class="a-name">Trail Run — Colón Trail <span class="chip trail_run">Trail</span></span>
+        <span class="num">41 min</span>
+        <span class="num">7.5 km</span>
+        <span class="num">147</span>
+        <span class="num">—</span>
+        <span class="num">—</span>
+        <span class="a-chevron"></span>
+      </summary>
       
-      <tr>
-        <td>Mié 3</td><td>Trail Run — Colón Trail</td>
-        <td><span class="chip trail_run">Trail</span></td>
-        <td class="num">41 min</td><td class="num">7.5 km</td>
-        <td class="num">147</td><td class="num">—</td>
-      </tr>
+    </details>
+    
+    <details class="activity" data-empty="1">
+      <summary>
+        <span class="a-day">Jue 4</span>
+        <span class="a-name">Trail Run — Colón Trail <span class="chip trail_run">Trail</span></span>
+        <span class="num">28 min</span>
+        <span class="num">4.6 km</span>
+        <span class="num">163</span>
+        <span class="num">—</span>
+        <span class="num">—</span>
+        <span class="a-chevron"></span>
+      </summary>
       
-      <tr>
-        <td>Jue 4</td><td>Trail Run — Colón Trail</td>
-        <td><span class="chip trail_run">Trail</span></td>
-        <td class="num">28 min</td><td class="num">4.6 km</td>
-        <td class="num">163</td><td class="num">—</td>
-      </tr>
+    </details>
+    
+    <details class="activity" data-empty="1">
+      <summary>
+        <span class="a-day">Vie 5</span>
+        <span class="a-name">Outdoor Run — Colón Carrera <span class="chip run">Ruta</span></span>
+        <span class="num">25 min</span>
+        <span class="num">4.7 km</span>
+        <span class="num">135</span>
+        <span class="num">—</span>
+        <span class="num">—</span>
+        <span class="a-chevron"></span>
+      </summary>
       
-      <tr>
-        <td>Vie 5</td><td>Outdoor Run — Colón Carrera</td>
-        <td><span class="chip run">Ruta</span></td>
-        <td class="num">25 min</td><td class="num">4.7 km</td>
-        <td class="num">135</td><td class="num">—</td>
-      </tr>
+    </details>
+    
+    <details class="activity" data-empty="1">
+      <summary>
+        <span class="a-day">Dom 7</span>
+        <span class="a-name">Trail Run — Merlo Trail <span class="chip trail_run">Trail</span></span>
+        <span class="num">18 min</span>
+        <span class="num">2.9 km</span>
+        <span class="num">139</span>
+        <span class="num">—</span>
+        <span class="num">—</span>
+        <span class="a-chevron"></span>
+      </summary>
       
-      <tr>
-        <td>Dom 7</td><td>Trail Run — Merlo Trail</td>
-        <td><span class="chip trail_run">Trail</span></td>
-        <td class="num">18 min</td><td class="num">2.9 km</td>
-        <td class="num">139</td><td class="num">—</td>
-      </tr>
+    </details>
+    
+    <details class="activity" data-empty="1">
+      <summary>
+        <span class="a-day">Dom 7</span>
+        <span class="a-name">Trail Run — Merlo Trail <span class="chip trail_run">Trail</span></span>
+        <span class="num">3 h 47 min</span>
+        <span class="num">36.5 km</span>
+        <span class="num">173</span>
+        <span class="num">—</span>
+        <span class="num">—</span>
+        <span class="a-chevron"></span>
+      </summary>
       
-      <tr>
-        <td>Dom 7</td><td>Trail Run — Merlo Trail</td>
-        <td><span class="chip trail_run">Trail</span></td>
-        <td class="num">3 h 47 min</td><td class="num">36.5 km</td>
-        <td class="num">173</td><td class="num">—</td>
-      </tr>
-      
-    </tbody>
-  </table>
+    </details>
+    
   </div>
   
 </section>

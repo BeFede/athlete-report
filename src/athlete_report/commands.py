@@ -36,6 +36,26 @@ def _day_bounds(start: date, end: date) -> tuple[datetime, datetime]:
     )
 
 
+def _enrich_from_details(store: Store, provider: AthleteProvider, activities: list) -> int:
+    """Completa carga/desnivel de cada actividad desde su detalle (si existe)
+    y persiste el detalle normalizado para embeberlo en snapshots."""
+    from .details import normalize_detail
+
+    enriched = 0
+    for act in activities:
+        raw = provider.fetch_activity_detail(act.external_activity_id)
+        if raw is None:
+            continue
+        detail = normalize_detail(raw.payload)
+        store.save_detail(act.provider, act.external_activity_id, detail)
+        if act.training_load is None and detail.get("training_load") is not None:
+            act.training_load = detail["training_load"]
+        if act.elevation_gain_m is None and detail.get("elevation_gain_m") is not None:
+            act.elevation_gain_m = detail["elevation_gain_m"]
+        enriched += 1
+    return enriched
+
+
 def _ingest_range(
     store: Store,
     provider: AthleteProvider,
@@ -49,11 +69,13 @@ def _ingest_range(
     activities = provider.fetch_activities(start_dt, end_dt)
     daily = provider.fetch_daily_metrics(daily_start, daily_end)
     status = provider.fetch_training_status(daily_start, daily_end)
+    enriched = _enrich_from_details(store, provider, activities)
     ingested_at = now.isoformat()
     return {
         "activities": store.upsert_activities(activities, ingested_at),
         "daily_metrics": store.upsert_daily_metrics(daily, ingested_at),
         "training_status": store.upsert_training_status(status, ingested_at),
+        "details": enriched,
     }
 
 

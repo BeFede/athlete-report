@@ -18,6 +18,7 @@ Tools del MCP de COROS (conector `b9aae74a-...`; cargalas con ToolSearch si est�
 3. `queryRestingHeartRate` — `days: 35`.
 4. `querySleepData` — rango `startDate`/`endDate` de 35 días.
 5. `querySleepHrv` — en bloques de 7 días (5 llamadas) para no exceder el límite de output; usar SOLO la sección "HRV Assessment" (HRV Avg por día), ignorar las series temporales.
+6. Por CADA actividad de la ventana que todavía no tenga detalle en `data/raw/coros/` (buscar su id en los dumps `kind: "activity_detail"` existentes): `getActivityDetail` + `queryActivityLapData` con `{labelId, sportType}`. Estos dan carga, desnivel, TE y parciales por km — datos clave del reporte. Si son más de ~10 actividades nuevas, delegá las llamadas a un subagente (Agent tool) que escriba el dump y devuelva sólo el conteo, para no llenar tu contexto con payloads.
 
 ## Paso 2 — Escribir dumps crudos
 
@@ -33,6 +34,7 @@ Items canónicos (parsear las respuestas de texto del MCP con un script Python e
   Mapa sportType → sport: 100 run, 101 indoor_run, 102 trail_run, 103 track_run, 104 hike, 402 strength; otro código → str(código). NO incluir coordenadas.
 - `kind: "daily_metrics"`: `{"date": "YYYY-MM-DD", "hrv": <HRV Avg>, "resting_hr": <rhr>, "sleep_duration_s": <Main Sleep en segundos>, "sleep_score": int}` — mergear las cuatro fuentes por fecha en UN solo archivo (el provider pisa por fecha, no mergea entre archivos).
 - `kind: "training_status"`: `{"date": "YYYY-MM-DD", "fitness": <Long-Term Load>, "fatigue": <Short-Term Load>, "status": "<Comment>"}`
+- `kind: "activity_detail"`: `{"external_activity_id": "<labelId>", "sportType": <int>, "date": "YYYY-MM-DD", "detail_text": "<texto verbatim de getActivityDetail>", "laps": <JSON verbatim de queryActivityLapData>}` — NO parsear: el CLI extrae carga/desnivel/TE/parciales de forma determinista.
 
 Está bien que la ventana se solape con dumps anteriores: el sync deduplica por id/fecha y el dump más nuevo gana.
 

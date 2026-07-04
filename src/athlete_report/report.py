@@ -52,9 +52,16 @@ def _coverage(week_activities, week_daily, week_start: date) -> dict[str, int]:
     }
 
 
-def _activity_public(a: dict[str, Any]) -> dict[str, Any]:
+DETAIL_PUBLIC_FIELDS = (
+    "training_load", "elevation_gain_m", "elevation_loss_m", "aerobic_te",
+    "anaerobic_te", "training_focus", "avg_power_w", "avg_cadence_spm",
+    "adjusted_pace_s", "best_km_s", "splits",
+)
+
+
+def _activity_public(a: dict[str, Any], detail: dict[str, Any] | None) -> dict[str, Any]:
     """Campos que van al reporte. Nunca coordenadas ni payloads crudos."""
-    return {
+    out = {
         "date": a.get("local_date"),
         "name": a.get("name"),
         "sport": a.get("sport"),
@@ -65,6 +72,9 @@ def _activity_public(a: dict[str, Any]) -> dict[str, Any]:
         "training_load": a.get("training_load"),
         "elevation_gain_m": a.get("elevation_gain_m"),
     }
+    if detail:
+        out["detail"] = {k: detail.get(k) for k in DETAIL_PUBLIC_FIELDS if detail.get(k) is not None}
+    return out
 
 
 def _fitness_for_week(
@@ -137,7 +147,10 @@ def build_snapshot(
     report_data = {
         "totals": totals,
         "by_sport": by_sport,
-        "activities": [_activity_public(a) for a in week_acts],
+        "activities": [
+            _activity_public(a, store.load_detail(a["provider"], a["external_activity_id"]))
+            for a in week_acts
+        ],
         "daily": [
             {
                 "date": m["date"],
