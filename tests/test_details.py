@@ -80,3 +80,28 @@ def test_html_muestra_detalle_expandible(paths):
     assert 'class="split-bar"' in html
     assert "5:10" in html  # mejor km
     assert "Desnivel" in html
+
+
+def test_parse_workout_laps():
+    from athlete_report.details import parse_workout_laps
+
+    laps = parse_workout_laps(DETAIL_LAPS)
+    assert len(laps) == 3
+    assert laps[1] == {
+        "n": 2, "distance_m": 400, "time_s": 78.0, "pace_s": 195.0,
+        "avg_hr": 155, "max_hr": 168, "avg_power_w": 340,
+        "elev_gain_m": 0.0, "elev_loss_m": 1.0,
+    }
+    # una sola vuelta (actividad sin estructura) no aporta
+    single = {"lapGroups": [{"type": 2, "laps": [{"lapIndex": 1, "distance": 1000000, "time": 3600.0}]}]}
+    assert parse_workout_laps(single) == []
+
+
+def test_html_muestra_vueltas_del_entrenamiento(paths):
+    seed_history(paths, TODAY - timedelta(days=100), TODAY)
+    cmd_publish(paths, provider=CorosMcpProvider(paths.raw_coros), now=NOW)
+    html = (paths.dist / "reports" / "2026-06-22" / "index.html").read_text()
+    assert "Vueltas del entrenamiento" in html
+    assert "Parciales por kilómetro" in html
+    assert "400 m" in html  # distancia de la serie corta
+    assert "3:15" in html   # ritmo de la serie (195 s/km)

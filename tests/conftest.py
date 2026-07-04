@@ -89,7 +89,19 @@ DETAIL_LAPS = {
                 {"lapIndex": 3, "distance": 50000, "time": 180.0, "avgPace": 360.0,
                  "avgHr": 148, "elevGain": 30.0, "totalDescent": 40.0, "avgPower": 250},
             ],
-        }
+        },
+        {
+            "type": 2,
+            "lapDistance": 100000,
+            "laps": [
+                {"lapIndex": 1, "distance": 100000, "time": 420.0, "avgPace": 420.0,
+                 "avgHr": 130, "maxHr": 140, "elevGain": 10.0, "totalDescent": 8.0, "avgPower": 200},
+                {"lapIndex": 2, "distance": 40000, "time": 78.0, "avgPace": 195.0,
+                 "avgHr": 155, "maxHr": 168, "elevGain": 0.0, "totalDescent": 1.0, "avgPower": 340},
+                {"lapIndex": 3, "distance": 110000, "time": 462.0, "avgPace": 420.0,
+                 "avgHr": 138, "maxHr": 150, "elevGain": 12.0, "totalDescent": 11.0, "avgPower": 205},
+            ],
+        },
     ]
 }
 

@@ -317,6 +317,46 @@ def _splits_view(splits: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
+def _fmt_lap_time(seconds: float | None) -> str:
+    if not seconds:
+        return "—"
+    total = int(round(seconds))
+    if total >= 3600:
+        return f"{total // 3600}:{(total % 3600) // 60:02d}:{total % 60:02d}"
+    return f"{total // 60}:{total % 60:02d}"
+
+
+def _fmt_lap_dist(meters: float | None) -> str:
+    if not meters:
+        return "—"
+    if meters < 950:
+        return f"{int(round(meters))} m"
+    return f"{meters / 1000:.2f}".rstrip("0").rstrip(".") + " km"
+
+
+def _workout_laps_view(laps: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    # barra ∝ velocidad, ignorando vueltas cortas de ruido para la referencia
+    paces = [l["pace_s"] for l in laps if l.get("pace_s") and (l.get("distance_m") or 0) >= 100]
+    fastest = min(paces) if paces else None
+    rows = []
+    for lap in laps:
+        pace = lap.get("pace_s")
+        rows.append(
+            {
+                "n": lap.get("n"),
+                "dist": _fmt_lap_dist(lap.get("distance_m")),
+                "time": _fmt_lap_time(lap.get("time_s")),
+                "pace": fmt_pace(pace),
+                "pct": round(fastest / pace * 100) if (pace and fastest) else 0,
+                "fastest": pace is not None and pace == fastest,
+                "hr": _n(lap.get("avg_hr")),
+                "power": _n(lap.get("avg_power_w")),
+                "elev": _elev(lap.get("elev_gain_m"), lap.get("elev_loss_m")),
+            }
+        )
+    return rows
+
+
 def _activity_view(a: dict[str, Any]) -> dict[str, Any]:
     det = a.get("detail") or {}
     load = a.get("training_load") if a.get("training_load") is not None else det.get("training_load")
@@ -350,6 +390,7 @@ def _activity_view(a: dict[str, Any]) -> dict[str, Any]:
         "has_detail": bool(det),
         "stats": stats,
         "splits": _splits_view(det.get("splits") or []),
+        "workout_laps": _workout_laps_view(det.get("workout_laps") or []),
     }
 
 

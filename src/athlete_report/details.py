@@ -83,9 +83,39 @@ def parse_km_splits(laps: dict[str, Any] | None) -> list[dict[str, Any]]:
     return splits
 
 
+def parse_workout_laps(laps: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """Vueltas del entrenamiento (grupo type=2): la estructura real de la
+    sesión (series, intervalos, marcas manuales). Distancias en cm."""
+    if not isinstance(laps, dict):
+        return []
+    groups = laps.get("lapGroups") or []
+    group = next((g for g in groups if g.get("type") == 2), None)
+    if not group:
+        return []
+    rows = []
+    for lap in group.get("laps") or []:
+        distance_m = (lap.get("distance") or 0) / 100.0
+        rows.append(
+            {
+                "n": lap.get("lapIndex"),
+                "distance_m": round(distance_m, 0),
+                "time_s": round(lap.get("time") or 0, 1),
+                "pace_s": round(lap.get("avgPace") or 0, 1) or None,
+                "avg_hr": lap.get("avgHr") or None,
+                "max_hr": lap.get("maxHr") or None,
+                "avg_power_w": lap.get("avgPower") or None,
+                "elev_gain_m": lap.get("elevGain"),
+                "elev_loss_m": lap.get("totalDescent"),
+            }
+        )
+    # una sola vuelta = sin estructura: no aporta nada sobre los splits
+    return rows if len(rows) >= 2 else []
+
+
 def normalize_detail(payload: dict[str, Any]) -> dict[str, Any]:
     """Payload del dump ({detail_text, laps, ...}) -> detalle normalizado."""
     text = payload.get("detail_text") or ""
     detail = parse_detail_text(text) if text else {}
     detail["splits"] = parse_km_splits(payload.get("laps"))
+    detail["workout_laps"] = parse_workout_laps(payload.get("laps"))
     return detail

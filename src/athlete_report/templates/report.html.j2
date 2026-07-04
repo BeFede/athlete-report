@@ -77,7 +77,30 @@
           {% endfor %}
         </div>
         {% endif %}
+        {% if a.workout_laps %}
+        <h4 class="detail-sub">Vueltas del entrenamiento</h4>
+        <div class="table-wrap">
+        <table class="splits">
+          <thead><tr><th>#</th><th class="num">Dist.</th><th class="num">Tiempo</th><th class="num">Ritmo</th><th style="width:28%">&nbsp;</th><th class="num">FC</th><th class="num">Pot.</th><th class="num">Desnivel</th></tr></thead>
+          <tbody>
+            {% for l in a.workout_laps %}
+            <tr>
+              <td>{{ l.n }}</td>
+              <td class="num">{{ l.dist }}</td>
+              <td class="num">{{ l.time }}</td>
+              <td class="num{% if l.fastest %} fastest{% endif %}">{{ l.pace }}</td>
+              <td><div class="split-bar"><i style="width: {{ l.pct }}%"></i></div></td>
+              <td class="num">{{ l.hr }}</td>
+              <td class="num">{{ l.power }}</td>
+              <td class="num">{{ l.elev }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+        {% endif %}
         {% if a.splits %}
+        {% if a.workout_laps %}<h4 class="detail-sub">Parciales por kilómetro</h4>{% endif %}
         <div class="table-wrap">
         <table class="splits">
           <thead><tr><th>Km</th><th>Ritmo</th><th style="width:38%">&nbsp;</th><th class="num">FC</th><th class="num">Desnivel</th></tr></thead>

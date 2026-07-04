@@ -55,7 +55,7 @@ def _coverage(week_activities, week_daily, week_start: date) -> dict[str, int]:
 DETAIL_PUBLIC_FIELDS = (
     "training_load", "elevation_gain_m", "elevation_loss_m", "aerobic_te",
     "anaerobic_te", "training_focus", "avg_power_w", "avg_cadence_spm",
-    "adjusted_pace_s", "best_km_s", "splits",
+    "adjusted_pace_s", "best_km_s", "splits", "workout_laps",
 )
 
 
@@ -73,7 +73,9 @@ def _activity_public(a: dict[str, Any], detail: dict[str, Any] | None) -> dict[s
         "elevation_gain_m": a.get("elevation_gain_m"),
     }
     if detail:
-        out["detail"] = {k: detail.get(k) for k in DETAIL_PUBLIC_FIELDS if detail.get(k) is not None}
+        out["detail"] = {
+            k: detail.get(k) for k in DETAIL_PUBLIC_FIELDS if detail.get(k) not in (None, [], {})
+        }
     return out
 
 
