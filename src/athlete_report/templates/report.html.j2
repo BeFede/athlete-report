@@ -137,13 +137,13 @@
     <div class="chart-card"><h3>Carga por día</h3><p class="sub">training load</p>{{ charts.load }}</div>
     {% endif %}
     {% if charts.hrv %}
-    <div class="chart-card"><h3>HRV nocturno</h3><p class="sub">ms · línea punteada: media 28 días</p>{{ charts.hrv }}</div>
+    <div class="chart-card"><h3>HRV nocturno</h3><p class="sub">ms · línea punteada: media 28 días{% if latest_recovery %} · <span class="sub-extra">ámbar: dato de hoy, fuera de la semana</span>{% endif %}</p>{{ charts.hrv }}</div>
     {% endif %}
     {% if charts.rhr %}
-    <div class="chart-card"><h3>FC en reposo</h3><p class="sub">ppm · línea punteada: media 28 días</p>{{ charts.rhr }}</div>
+    <div class="chart-card"><h3>FC en reposo</h3><p class="sub">ppm · línea punteada: media 28 días{% if latest_recovery %} · <span class="sub-extra">ámbar: dato de hoy</span>{% endif %}</p>{{ charts.rhr }}</div>
     {% endif %}
     {% if charts.sleep %}
-    <div class="chart-card"><h3>Sueño</h3><p class="sub">horas · línea punteada: media 28 días</p>{{ charts.sleep }}</div>
+    <div class="chart-card"><h3>Sueño</h3><p class="sub">horas · línea punteada: media 28 días{% if latest_recovery %} · <span class="sub-extra">ámbar: dato de hoy</span>{% endif %}</p>{{ charts.sleep }}</div>
     {% endif %}
   </div>
 </section>
@@ -155,6 +155,15 @@
   <p style="margin: 0 0 10px; font-size: 0.9rem;">
     HRV: <strong>{{ wk_vs.hrv }}</strong> · FC reposo: <strong>{{ wk_vs.rhr }}</strong> · Sueño: <strong>{{ wk_vs.sleep }}</strong>
   </p>
+  {% if latest_recovery %}
+  <div class="today-note">
+    <span class="today-note-label">Dato extra — {{ latest_recovery.date_label }}</span>
+    (fuera de esta semana, la noche más reciente registrada):
+    HRV <strong>{{ latest_recovery.hrv }}</strong> ·
+    FC reposo <strong>{{ latest_recovery.rhr }}</strong> ·
+    Sueño <strong>{{ latest_recovery.sleep }}</strong>
+  </div>
+  {% endif %}
   <details class="data-table">
     <summary>Ver tabla diaria</summary>
     <div class="table-wrap">

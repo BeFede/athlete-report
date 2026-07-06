@@ -163,27 +163,38 @@ def bar_chart(
     title: str,
     value_fmt: Callable[[float], str] = _num1,
     baseline: float | None = None,
+    extra_point: tuple[str, float | None] | None = None,
 ) -> Markup | None:
-    """Barras por día. points: [(etiqueta, valor|None)]. None = sin barra."""
-    values = [v for _, v in points if v is not None]
+    """Barras por día. points: [(etiqueta, valor|None)]. None = sin barra.
+
+    extra_point: un punto adicional fuera de la semana (p.ej. "hoy"), pintado
+    con un color distinto para dejar claro que no forma parte del cierre
+    semanal congelado.
+    """
+    all_points = list(points) + ([extra_point] if extra_point else [])
+    extra_index = len(points) if extra_point else None
+    values = [v for _, v in all_points if v is not None]
     if not values:
         return None
     plot_h, plot_w = _plot_area()
     vmax = max(max(values), baseline or 0) or 1
-    slot = plot_w / len(points)
+    slot = plot_w / len(all_points)
     bar_w = slot * 0.6
     parts = [_svg_open(title)]
-    for i, (label, value) in enumerate(points):
+    for i, (label, value) in enumerate(all_points):
         cx = PAD_X + slot * i + slot / 2
+        is_extra = i == extra_index
+        axis_cls = "chart-axis chart-axis-extra" if is_extra else "chart-axis"
         parts.append(
-            f'<text x="{cx:.1f}" y="{CHART_H - 8}" class="chart-axis" text-anchor="middle">{label}</text>'
+            f'<text x="{cx:.1f}" y="{CHART_H - 8}" class="{axis_cls}" text-anchor="middle">{label}</text>'
         )
         if value is None:
             continue
         h = value / vmax * plot_h
         y = PAD_TOP + plot_h - h
+        bar_cls = "chart-bar chart-bar-extra" if is_extra else "chart-bar"
         parts.append(
-            f'<rect x="{cx - bar_w / 2:.1f}" y="{y:.1f}" width="{bar_w:.1f}" height="{h:.1f}" rx="4" class="chart-bar"/>'
+            f'<rect x="{cx - bar_w / 2:.1f}" y="{y:.1f}" width="{bar_w:.1f}" height="{h:.1f}" rx="4" class="{bar_cls}"/>'
             f'<text x="{cx:.1f}" y="{y - 5:.1f}" class="chart-value" text-anchor="middle">{value_fmt(value)}</text>'
         )
     if baseline is not None and baseline > 0:
@@ -201,19 +212,28 @@ def line_chart(
     baseline: float | None = None,
     series2: list[float | None] | None = None,
     legend: tuple[str, str] | None = None,
+    extra_point: tuple[str, float | None] | None = None,
 ) -> Markup | None:
-    """Línea por día (con serie secundaria opcional). None = hueco."""
+    """Línea por día (con serie secundaria opcional). None = hueco.
+
+    extra_point: un punto adicional fuera de la semana (p.ej. "hoy"), unido
+    por un segmento punteado y pintado con un color distinto.
+    """
     values = [v for _, v in points if v is not None]
-    extra = [v for v in (series2 or []) if v is not None]
+    series2_vals = [v for v in (series2 or []) if v is not None]
     if not values:
         return None
+    extra_index = len(points) if extra_point else None
+    all_points = list(points) + ([extra_point] if extra_point else [])
     plot_h, plot_w = _plot_area()
-    all_vals = values + extra + ([baseline] if baseline is not None else [])
+    all_vals = values + series2_vals + ([baseline] if baseline is not None else [])
+    if extra_point is not None and extra_point[1] is not None:
+        all_vals.append(extra_point[1])
     vmin, vmax = min(all_vals), max(all_vals)
     span = (vmax - vmin) or 1
     vmin -= span * 0.15
     vmax += span * 0.15
-    slot = plot_w / len(points)
+    slot = plot_w / len(all_points)
 
     def xy(i: int, v: float) -> tuple[float, float]:
         x = PAD_X + slot * i + slot / 2
@@ -248,10 +268,11 @@ def line_chart(
         return "".join(out)
 
     parts = [_svg_open(title)]
-    for i, (label, _) in enumerate(points):
+    for i, (label, _) in enumerate(all_points):
         cx = PAD_X + slot * i + slot / 2
+        axis_cls = "chart-axis chart-axis-extra" if i == extra_index else "chart-axis"
         parts.append(
-            f'<text x="{cx:.1f}" y="{CHART_H - 8}" class="chart-axis" text-anchor="middle">{label}</text>'
+            f'<text x="{cx:.1f}" y="{CHART_H - 8}" class="{axis_cls}" text-anchor="middle">{label}</text>'
         )
     if baseline is not None:
         y = PAD_TOP + (vmax - baseline) / (vmax - vmin) * plot_h
@@ -259,6 +280,21 @@ def line_chart(
     if series2 is not None:
         parts.append(series_svg(list(series2), "chart-line2", False))
     parts.append(series_svg([v for _, v in points], "chart-line", True))
+    if extra_point is not None and extra_point[1] is not None:
+        last_i, last_val = next(
+            ((i, v) for i in range(len(points) - 1, -1, -1) if (v := points[i][1]) is not None),
+            (None, None),
+        )
+        if last_val is not None:
+            x1, y1 = xy(last_i, last_val)
+            x2, y2 = xy(extra_index, extra_point[1])
+            parts.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" class="chart-line-extra"/>')
+        else:
+            x2, y2 = xy(extra_index, extra_point[1])
+        parts.append(f'<circle cx="{x2:.1f}" cy="{y2:.1f}" r="3.5" class="chart-line-extra-dot"/>')
+        parts.append(
+            f'<text x="{x2:.1f}" y="{y2 - 8:.1f}" class="chart-value chart-value-extra" text-anchor="middle">{value_fmt(extra_point[1])}</text>'
+        )
     if legend:
         parts.append(
             f'<text x="{PAD_X}" y="12" class="chart-legend"><tspan class="legend1">● {legend[0]}</tspan>'
@@ -418,6 +454,18 @@ def render_report(snapshot: dict[str, Any], nav: dict[str, Any], meta: dict[str,
     base = rd["baselines_28d"]
     wk = rd["week_averages"]
 
+    # dato de recuperación posterior al cierre (p.ej. "hoy"): se pinta distinto,
+    # no forma parte de la semana congelada.
+    latest = rd.get("latest_recovery")
+    extra_label = _day_label(date.fromisoformat(latest["date"])) if latest else None
+    extra_hrv = (extra_label, latest.get("hrv")) if latest and latest.get("hrv") is not None else None
+    extra_rhr = (extra_label, latest.get("rhr")) if latest and latest.get("rhr") is not None else None
+    extra_sleep = (
+        (extra_label, latest["sleep_duration_s"] / 3600)
+        if latest and latest.get("sleep_duration_s") is not None
+        else None
+    )
+
     charts = {
         "load": bar_chart(
             day_points(lambda d: load_by_day.get(d.isoformat())),
@@ -431,6 +479,7 @@ def render_report(snapshot: dict[str, Any], nav: dict[str, Any], meta: dict[str,
             day_points(lambda d: (daily_by_date.get(d.isoformat()) or {}).get("hrv")),
             title="HRV nocturno (ms)",
             baseline=base.get("hrv"),
+            extra_point=extra_hrv,
         ),
         "sleep": bar_chart(
             day_points(
@@ -440,11 +489,13 @@ def render_report(snapshot: dict[str, Any], nav: dict[str, Any], meta: dict[str,
             ),
             title="Horas de sueño por día",
             baseline=(base["sleep_duration_s"] / 3600) if base.get("sleep_duration_s") else None,
+            extra_point=extra_sleep,
         ),
         "rhr": line_chart(
             day_points(lambda d: (daily_by_date.get(d.isoformat()) or {}).get("rhr")),
             title="Frecuencia cardíaca en reposo (ppm)",
             baseline=base.get("rhr"),
+            extra_point=extra_rhr,
         ),
     }
 
@@ -465,6 +516,16 @@ def render_report(snapshot: dict[str, Any], nav: dict[str, Any], meta: dict[str,
         "rhr": _vs_baseline(wk.get("rhr"), base.get("rhr"), _n),
         "sleep": _vs_baseline(wk.get("sleep_duration_s"), base.get("sleep_duration_s"), _sleep_h),
     }
+
+    latest = rd.get("latest_recovery")
+    latest_recovery = None
+    if latest:
+        latest_recovery = {
+            "date_label": fmt_date_long(date.fromisoformat(latest["date"])),
+            "hrv": _n(latest.get("hrv")),
+            "rhr": _n(latest.get("rhr")),
+            "sleep": _sleep_h(latest.get("sleep_duration_s")),
+        }
 
     bc = rd["block_comparison"]
     cur, prev, delta = bc["current_28d"], bc["previous_28d"], bc["delta_pct"]
@@ -522,6 +583,7 @@ def render_report(snapshot: dict[str, Any], nav: dict[str, Any], meta: dict[str,
         has_charts=any(charts.values()),
         daily_rows=daily_rows,
         wk_vs=wk_vs,
+        latest_recovery=latest_recovery,
         block_rows=block_rows,
         coverage_line=coverage_line,
         providers_line=providers_line,

@@ -8,7 +8,7 @@ Los snapshots cerrados no se modifican salvo --overwrite o rebuild explícito.
 from __future__ import annotations
 
 import json
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from .config import SCHEMA_VERSION, ProjectPaths
@@ -77,6 +77,36 @@ def _activity_public(a: dict[str, Any], detail: dict[str, Any] | None) -> dict[s
             k: detail.get(k) for k in DETAIL_PUBLIC_FIELDS if detail.get(k) not in (None, [], {})
         }
     return out
+
+
+LATEST_RECOVERY_MAX_LAG_DAYS = 3
+
+
+def _latest_recovery_after(daily: list[dict[str, Any]], week_end: date) -> dict[str, Any] | None:
+    """Métrica diaria más reciente posterior al cierre de la semana.
+
+    No forma parte de la semana (que sigue Mon-Dom, congelada); es un dato
+    suelto de recuperación para cuando el reporte se envía pocos días después
+    del cierre y ya hay una noche más de HRV/sueño registrada. Acotado a unos
+    pocos días de margen: si se reconstruye una semana vieja mucho después,
+    no debe aparecer el dato de "hoy" como si fuera reciente.
+    """
+    lag_limit = week_end + timedelta(days=LATEST_RECOVERY_MAX_LAG_DAYS)
+    candidates = [
+        m for m in daily
+        if m.get("date") and week_end < date.fromisoformat(m["date"]) <= lag_limit
+    ]
+    if not candidates:
+        return None
+    latest = max(candidates, key=lambda m: m["date"])
+    if latest.get("hrv") is None and latest.get("rhr") is None and latest.get("sleep_duration_s") is None:
+        return None
+    return {
+        "date": latest["date"],
+        "hrv": latest.get("hrv"),
+        "rhr": latest.get("rhr"),
+        "sleep_duration_s": latest.get("sleep_duration_s"),
+    }
 
 
 def _fitness_for_week(
@@ -169,6 +199,7 @@ def build_snapshot(
         "block_comparison": block_comparison(activities, week_end),
         "baselines_28d": baselines(daily, week_end),
         "week_averages": week_averages(daily, week_start, week_end),
+        "latest_recovery": _latest_recovery_after(daily, week_end),
     }
 
     return {

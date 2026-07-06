@@ -149,10 +149,22 @@ svg.chart { width: 100%; height: auto; display: block; }
 .chart-value { fill: var(--ink); font-size: 10px; font-weight: 600; }
 .chart-baseline { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; opacity: 0.8; }
 .chart-baseline-label { fill: var(--muted); font-size: 9px; }
+.chart-bar-extra { fill: var(--chart-line2); opacity: 0.85; }
+.chart-line-extra { stroke: var(--chart-line2); stroke-width: 2; stroke-dasharray: 3 3; }
+.chart-line-extra-dot { fill: var(--chart-line2); }
+.chart-value-extra { fill: var(--chart-line2); }
+.chart-axis-extra { fill: var(--chart-line2); font-weight: 650; }
+.sub-extra { color: var(--chart-line2); }
 .chart-legend { font-size: 10px; }
 .chart-legend .legend1 { fill: var(--accent); font-weight: 600; }
 .chart-legend .legend2 { fill: var(--chart-line2); font-weight: 600; }
 
+.today-note {
+  background: var(--accent-soft); border: 1px dashed var(--accent);
+  border-radius: 10px; padding: 8px 12px; margin: 0 0 12px;
+  font-size: 0.84rem; color: var(--ink);
+}
+.today-note-label { color: var(--accent-strong); font-weight: 650; }
 details.data-table { margin-top: 12px; }
 details.data-table summary { cursor: pointer; color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
 
@@ -2120,6 +2132,7 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
   <p style="margin: 0 0 10px; font-size: 0.9rem;">
     HRV: <strong>70.1 (baseline 69.7)</strong> · FC reposo: <strong>50 (baseline 49.4)</strong> · Sueño: <strong>7.8 h (baseline 7.9 h)</strong>
   </p>
+  
   <details class="data-table">
     <summary>Ver tabla diaria</summary>
     <div class="table-wrap">

@@ -99,3 +99,38 @@ def test_fitness_computado_sin_status_del_proveedor(seeded):
     fit = snap["report_data"]["fitness"]
     assert fit["source"] == "computed"
     assert fit["fitness_42d"] > 0
+
+
+def test_latest_recovery_dato_fuera_de_semana(paths):
+    from conftest import write_dump
+
+    # sin datos posteriores al cierre de semana (2026-06-28)
+    seed_history(paths, date(2026, 4, 1), date(2026, 6, 28))
+    write_dump(paths, "extra.json", "daily_metrics", [
+        {"date": "2026-06-30", "hrv": 68, "resting_hr": 47, "sleep_duration_s": 27000},
+    ])
+    week, _ = cmd_generate_latest(paths, provider=_provider(paths), now=NOW)
+    snap = json.loads(paths.report_json(week).read_text())
+    latest = snap["report_data"]["latest_recovery"]
+    assert latest == {"date": "2026-06-30", "hrv": 68, "rhr": 47, "sleep_duration_s": 27000}
+
+
+def test_latest_recovery_ausente_sin_datos_posteriores(paths):
+    seed_history(paths, date(2026, 4, 1), date(2026, 6, 28))
+    week, _ = cmd_generate_latest(paths, provider=_provider(paths), now=NOW)
+    snap = json.loads(paths.report_json(week).read_text())
+    assert snap["report_data"]["latest_recovery"] is None
+
+
+def test_latest_recovery_no_aparece_si_es_muy_lejano(paths):
+    """Al reconstruir una semana vieja mucho después, no debe traer el dato
+    de "hoy" como si fuera reciente."""
+    from conftest import write_dump
+
+    seed_history(paths, date(2026, 4, 1), date(2026, 6, 28))
+    write_dump(paths, "extra.json", "daily_metrics", [
+        {"date": "2026-07-10", "hrv": 68, "resting_hr": 47, "sleep_duration_s": 27000},
+    ])
+    week, _ = cmd_generate_latest(paths, provider=_provider(paths), now=NOW)
+    snap = json.loads(paths.report_json(week).read_text())
+    assert snap["report_data"]["latest_recovery"] is None
