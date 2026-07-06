@@ -228,8 +228,8 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
     <p class="kicker">Reporte semanal de entrenamiento</p>
     <h1>Semana del 27 de abril al 3 de mayo de 2026</h1>
     <p class="meta">Generado el 4 de julio de 2026</p>
-    <p class="meta">Datos sincronizados hasta el 4 de julio de 2026</p>
-    <p class="meta">Reconstruido el 5 de julio de 2026</p>
+    <p class="meta">Datos sincronizados hasta el 6 de julio de 2026</p>
+    <p class="meta">Reconstruido el 6 de julio de 2026</p>
     
   </div>
 </header>
@@ -242,6 +242,8 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
   <label>
     Semana:
     <select onchange="if(this.value)location.href='../'+this.value+'/'">
+      
+      <option value="2026-06-29" >29 jun 2026</option>
       
       <option value="2026-06-22" >22 jun 2026</option>
       
@@ -265,11 +267,9 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
       
       <option value="2026-04-13" >13 abr 2026</option>
       
-      <option value="2026-04-06" >6 abr 2026</option>
-      
     </select>
   </label>
-  <a href="../2026-06-22/">Última semana</a>
+  <a href="../2026-06-29/">Última semana</a>
   <a href="../../archive/">Evolución semanal</a>
 </nav>
 
@@ -277,11 +277,11 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
   <div class="card accent"><div class="label">Sesiones</div><div class="value">6</div></div>
   <div class="card accent"><div class="label">Tiempo</div><div class="value">8 h 43 min</div></div>
   <div class="card accent"><div class="label">Distancia</div><div class="value">86.7 km</div></div>
-  <div class="card accent"><div class="label">Desnivel</div><div class="value">—</div></div>
-  <div class="card accent"><div class="label">Carga semanal</div><div class="value">—</div></div>
-  <div class="card"><div class="label">Fitness</div><div class="value">—</div><div class="sub">carga 42 días</div></div>
-  <div class="card"><div class="label">Fatiga</div><div class="value">—</div><div class="sub">carga 7 días</div></div>
-  <div class="card"><div class="label">Forma</div><div class="value">—</div><div class="sub">fitness − fatiga</div></div>
+  <div class="card accent"><div class="label">Desnivel</div><div class="value">+3421 m</div></div>
+  <div class="card accent"><div class="label">Carga semanal</div><div class="value">1056</div></div>
+  <div class="card"><div class="label">Fitness</div><div class="value">135</div><div class="sub">carga 42 días</div></div>
+  <div class="card"><div class="label">Fatiga</div><div class="value">164.9</div><div class="sub">carga 7 días</div></div>
+  <div class="card"><div class="label">Forma</div><div class="value">-29.9</div><div class="sub">fitness − fatiga</div></div>
 </div>
 
 <section>
@@ -292,87 +292,738 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
       <span>Día</span><span>Actividad</span><span class="num">Tiempo</span><span class="num">Distancia</span><span class="num">FC</span><span class="num">Carga</span><span class="num">Desnivel</span><span></span>
     </div>
     
-    <details class="activity" data-empty="1">
+    <details class="activity" >
       <summary>
         <span class="a-day">Lun 27</span>
         <span class="a-name">Outdoor Run — Colón Department Run <span class="chip run">Ruta</span></span>
         <span class="num">1 h 06 min</span>
         <span class="num">13.3 km</span>
         <span class="num">139</span>
-        <span class="num">—</span>
-        <span class="num">—</span>
-        <span class="a-chevron"></span>
+        <span class="num">103</span>
+        <span class="num">+42 m</span>
+        <span class="a-chevron">&#9662;</span>
       </summary>
+      
+      <div class="a-detail">
+        
+        <div class="a-stats">
+          
+          <div class="a-stat"><span class="label">Carga</span><span class="value">103</span></div>
+          
+          <div class="a-stat"><span class="label">Desnivel</span><span class="value">+42/-49 m</span></div>
+          
+          <div class="a-stat"><span class="label">TE aeróbico</span><span class="value">2.5</span></div>
+          
+          <div class="a-stat"><span class="label">TE anaeróbico</span><span class="value">1.4</span></div>
+          
+          <div class="a-stat"><span class="label">Potencia media</span><span class="value">227 W</span></div>
+          
+          <div class="a-stat"><span class="label">Cadencia</span><span class="value">163 spm</span></div>
+          
+          <div class="a-stat"><span class="label">Ritmo ajustado</span><span class="value">4:57 /km</span></div>
+          
+          <div class="a-stat"><span class="label">Mejor km</span><span class="value">3:23 /km</span></div>
+          
+          <div class="a-stat"><span class="label">Foco</span><span class="value">Base</span></div>
+          
+        </div>
+        
+        
+        
+      </div>
       
     </details>
     
-    <details class="activity" data-empty="1">
+    <details class="activity" >
       <summary>
         <span class="a-day">Mar 28</span>
         <span class="a-name">Trail Run — Córdoba Trail Run <span class="chip trail_run">Trail</span></span>
         <span class="num">50 min</span>
         <span class="num">8.0 km</span>
         <span class="num">151</span>
-        <span class="num">—</span>
-        <span class="num">—</span>
-        <span class="a-chevron"></span>
+        <span class="num">132</span>
+        <span class="num">+422 m</span>
+        <span class="a-chevron">&#9662;</span>
       </summary>
+      
+      <div class="a-detail">
+        
+        <div class="a-stats">
+          
+          <div class="a-stat"><span class="label">Carga</span><span class="value">132</span></div>
+          
+          <div class="a-stat"><span class="label">Desnivel</span><span class="value">+422/-422 m</span></div>
+          
+          <div class="a-stat"><span class="label">TE aeróbico</span><span class="value">2.6</span></div>
+          
+          <div class="a-stat"><span class="label">TE anaeróbico</span><span class="value">2.5</span></div>
+          
+          <div class="a-stat"><span class="label">Potencia media</span><span class="value">218 W</span></div>
+          
+          <div class="a-stat"><span class="label">Cadencia</span><span class="value">164 spm</span></div>
+          
+          <div class="a-stat"><span class="label">Ritmo ajustado</span><span class="value">4:43 /km</span></div>
+          
+          <div class="a-stat"><span class="label">Mejor km</span><span class="value">4:34 /km</span></div>
+          
+          <div class="a-stat"><span class="label">Foco</span><span class="value">Threshold</span></div>
+          
+        </div>
+        
+        
+        <h4 class="detail-sub">Vueltas del entrenamiento</h4>
+        <div class="table-wrap">
+        <table class="splits">
+          <thead><tr><th>#</th><th class="num">Dist.</th><th class="num">Tiempo</th><th class="num">Ritmo</th><th style="width:28%">&nbsp;</th><th class="num">FC</th><th class="num">Pot.</th><th class="num">Desnivel</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td>1</td>
+              <td class="num">1 km</td>
+              <td class="num">7:51</td>
+              <td class="num">7:51</td>
+              <td><div class="split-bar"><i style="width: 61%"></i></div></td>
+              <td class="num">145</td>
+              <td class="num">233</td>
+              <td class="num">+98/-9 m</td>
+            </tr>
+            
+            <tr>
+              <td>2</td>
+              <td class="num">1 km</td>
+              <td class="num">6:32</td>
+              <td class="num">6:32</td>
+              <td><div class="split-bar"><i style="width: 73%"></i></div></td>
+              <td class="num">141</td>
+              <td class="num">141</td>
+              <td class="num">+21/-98 m</td>
+            </tr>
+            
+            <tr>
+              <td>3</td>
+              <td class="num">1 km</td>
+              <td class="num">6:20</td>
+              <td class="num">6:20</td>
+              <td><div class="split-bar"><i style="width: 75%"></i></div></td>
+              <td class="num">165</td>
+              <td class="num">283</td>
+              <td class="num">+99/-19 m</td>
+            </tr>
+            
+            <tr>
+              <td>4</td>
+              <td class="num">1 km</td>
+              <td class="num">5:35</td>
+              <td class="num">5:35</td>
+              <td><div class="split-bar"><i style="width: 86%"></i></div></td>
+              <td class="num">141</td>
+              <td class="num">156</td>
+              <td class="num">+12/-104 m</td>
+            </tr>
+            
+            <tr>
+              <td>5</td>
+              <td class="num">1 km</td>
+              <td class="num">6:55</td>
+              <td class="num">6:55</td>
+              <td><div class="split-bar"><i style="width: 69%"></i></div></td>
+              <td class="num">166</td>
+              <td class="num">294</td>
+              <td class="num">+108/-5 m</td>
+            </tr>
+            
+            <tr>
+              <td>6</td>
+              <td class="num">1 km</td>
+              <td class="num">4:47</td>
+              <td class="num fastest">4:47</td>
+              <td><div class="split-bar"><i style="width: 100%"></i></div></td>
+              <td class="num">158</td>
+              <td class="num">208</td>
+              <td class="num">+17/-105 m</td>
+            </tr>
+            
+            <tr>
+              <td>7</td>
+              <td class="num">1 km</td>
+              <td class="num">6:41</td>
+              <td class="num">6:41</td>
+              <td><div class="split-bar"><i style="width: 72%"></i></div></td>
+              <td class="num">153</td>
+              <td class="num">230</td>
+              <td class="num">+63/-46 m</td>
+            </tr>
+            
+            <tr>
+              <td>8</td>
+              <td class="num">1 km</td>
+              <td class="num">5:28</td>
+              <td class="num">5:28</td>
+              <td><div class="split-bar"><i style="width: 87%"></i></div></td>
+              <td class="num">134</td>
+              <td class="num">180</td>
+              <td class="num">+4/-36 m</td>
+            </tr>
+            
+          </tbody>
+        </table>
+        </div>
+        
+        
+      </div>
       
     </details>
     
-    <details class="activity" data-empty="1">
+    <details class="activity" >
       <summary>
         <span class="a-day">Mié 29</span>
         <span class="a-name">Trail Run — Córdoba Trail Run <span class="chip trail_run">Trail</span></span>
         <span class="num">48 min</span>
         <span class="num">10.1 km</span>
         <span class="num">154</span>
-        <span class="num">—</span>
-        <span class="num">—</span>
-        <span class="a-chevron"></span>
+        <span class="num">111</span>
+        <span class="num">+227 m</span>
+        <span class="a-chevron">&#9662;</span>
       </summary>
+      
+      <div class="a-detail">
+        
+        <div class="a-stats">
+          
+          <div class="a-stat"><span class="label">Carga</span><span class="value">111</span></div>
+          
+          <div class="a-stat"><span class="label">Desnivel</span><span class="value">+227/-233 m</span></div>
+          
+          <div class="a-stat"><span class="label">TE aeróbico</span><span class="value">2.6</span></div>
+          
+          <div class="a-stat"><span class="label">TE anaeróbico</span><span class="value">1.3</span></div>
+          
+          <div class="a-stat"><span class="label">Potencia media</span><span class="value">247 W</span></div>
+          
+          <div class="a-stat"><span class="label">Cadencia</span><span class="value">167 spm</span></div>
+          
+          <div class="a-stat"><span class="label">Ritmo ajustado</span><span class="value">4:30 /km</span></div>
+          
+          <div class="a-stat"><span class="label">Mejor km</span><span class="value">3:17 /km</span></div>
+          
+          <div class="a-stat"><span class="label">Foco</span><span class="value">Base</span></div>
+          
+        </div>
+        
+        
+        <h4 class="detail-sub">Vueltas del entrenamiento</h4>
+        <div class="table-wrap">
+        <table class="splits">
+          <thead><tr><th>#</th><th class="num">Dist.</th><th class="num">Tiempo</th><th class="num">Ritmo</th><th style="width:28%">&nbsp;</th><th class="num">FC</th><th class="num">Pot.</th><th class="num">Desnivel</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td>1</td>
+              <td class="num">4 km</td>
+              <td class="num">22:40</td>
+              <td class="num">5:40</td>
+              <td><div class="split-bar"><i style="width: 60%"></i></div></td>
+              <td class="num">142</td>
+              <td class="num">210</td>
+              <td class="num">+102/-88 m</td>
+            </tr>
+            
+            <tr>
+              <td>2</td>
+              <td class="num">2.5 km</td>
+              <td class="num">11:40</td>
+              <td class="num">4:40</td>
+              <td><div class="split-bar"><i style="width: 73%"></i></div></td>
+              <td class="num">169</td>
+              <td class="num">295</td>
+              <td class="num">+107/-22 m</td>
+            </tr>
+            
+            <tr>
+              <td>3</td>
+              <td class="num">555 m</td>
+              <td class="num">2:48</td>
+              <td class="num">5:03</td>
+              <td><div class="split-bar"><i style="width: 68%"></i></div></td>
+              <td class="num">146</td>
+              <td class="num">209</td>
+              <td class="num">+4/-31 m</td>
+            </tr>
+            
+            <tr>
+              <td>4</td>
+              <td class="num">2.52 km</td>
+              <td class="num">8:37</td>
+              <td class="num fastest">3:26</td>
+              <td><div class="split-bar"><i style="width: 100%"></i></div></td>
+              <td class="num">169</td>
+              <td class="num">294</td>
+              <td class="num">+3/-84 m</td>
+            </tr>
+            
+            <tr>
+              <td>5</td>
+              <td class="num">506 m</td>
+              <td class="num">3:02</td>
+              <td class="num">6:00</td>
+              <td><div class="split-bar"><i style="width: 57%"></i></div></td>
+              <td class="num">152</td>
+              <td class="num">242</td>
+              <td class="num">+11/-8 m</td>
+            </tr>
+            
+          </tbody>
+        </table>
+        </div>
+        
+        
+        <h4 class="detail-sub">Parciales por kilómetro</h4>
+        <div class="table-wrap">
+        <table class="splits">
+          <thead><tr><th>Km</th><th>Ritmo</th><th style="width:38%">&nbsp;</th><th class="num">FC</th><th class="num">Desnivel</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td>1</td>
+              <td class="num">5:39</td>
+              <td><div class="split-bar"><i style="width: 60%"></i></div></td>
+              <td class="num">135</td>
+              <td class="num">+25/-15 m</td>
+            </tr>
+            
+            <tr>
+              <td>2</td>
+              <td class="num">6:07</td>
+              <td><div class="split-bar"><i style="width: 55%"></i></div></td>
+              <td class="num">149</td>
+              <td class="num">+45/-1 m</td>
+            </tr>
+            
+            <tr>
+              <td>3</td>
+              <td class="num">5:03</td>
+              <td><div class="split-bar"><i style="width: 67%"></i></div></td>
+              <td class="num">141</td>
+              <td class="num">+12/-56 m</td>
+            </tr>
+            
+            <tr>
+              <td>4</td>
+              <td class="num">5:49</td>
+              <td><div class="split-bar"><i style="width: 58%"></i></div></td>
+              <td class="num">142</td>
+              <td class="num">+22/-22 m</td>
+            </tr>
+            
+            <tr>
+              <td>5</td>
+              <td class="num">4:34</td>
+              <td><div class="split-bar"><i style="width: 74%"></i></div></td>
+              <td class="num">168</td>
+              <td class="num">+49/-0 m</td>
+            </tr>
+            
+            <tr>
+              <td>6</td>
+              <td class="num">4:54</td>
+              <td><div class="split-bar"><i style="width: 69%"></i></div></td>
+              <td class="num">172</td>
+              <td class="num">+47/-8 m</td>
+            </tr>
+            
+            <tr>
+              <td>7</td>
+              <td class="num">4:37</td>
+              <td><div class="split-bar"><i style="width: 73%"></i></div></td>
+              <td class="num">157</td>
+              <td class="num">+14/-37 m</td>
+            </tr>
+            
+            <tr>
+              <td>8</td>
+              <td class="num">3:29</td>
+              <td><div class="split-bar"><i style="width: 97%"></i></div></td>
+              <td class="num">158</td>
+              <td class="num">+0/-58 m</td>
+            </tr>
+            
+            <tr>
+              <td>9</td>
+              <td class="num fastest">3:22</td>
+              <td><div class="split-bar"><i style="width: 100%"></i></div></td>
+              <td class="num">173</td>
+              <td class="num">+2/-22 m</td>
+            </tr>
+            
+            <tr>
+              <td>10</td>
+              <td class="num">4:44</td>
+              <td><div class="split-bar"><i style="width: 71%"></i></div></td>
+              <td class="num">163</td>
+              <td class="num">+11/-11 m</td>
+            </tr>
+            
+          </tbody>
+        </table>
+        </div>
+        
+      </div>
       
     </details>
     
-    <details class="activity" data-empty="1">
+    <details class="activity" >
       <summary>
         <span class="a-day">Jue 30</span>
         <span class="a-name">Outdoor Run — Colón Department Run <span class="chip run">Ruta</span></span>
         <span class="num">32 min</span>
         <span class="num">6.6 km</span>
         <span class="num">146</span>
-        <span class="num">—</span>
-        <span class="num">—</span>
-        <span class="a-chevron"></span>
+        <span class="num">34</span>
+        <span class="num">+45 m</span>
+        <span class="a-chevron">&#9662;</span>
       </summary>
+      
+      <div class="a-detail">
+        
+        <div class="a-stats">
+          
+          <div class="a-stat"><span class="label">Carga</span><span class="value">34</span></div>
+          
+          <div class="a-stat"><span class="label">Desnivel</span><span class="value">+45/-47 m</span></div>
+          
+          <div class="a-stat"><span class="label">TE aeróbico</span><span class="value">1.7</span></div>
+          
+          <div class="a-stat"><span class="label">TE anaeróbico</span><span class="value">0</span></div>
+          
+          <div class="a-stat"><span class="label">Potencia media</span><span class="value">231 W</span></div>
+          
+          <div class="a-stat"><span class="label">Cadencia</span><span class="value">165 spm</span></div>
+          
+          <div class="a-stat"><span class="label">Ritmo ajustado</span><span class="value">4:52 /km</span></div>
+          
+          <div class="a-stat"><span class="label">Mejor km</span><span class="value">4:44 /km</span></div>
+          
+          <div class="a-stat"><span class="label">Foco</span><span class="value">Recovery</span></div>
+          
+        </div>
+        
+        
+        <h4 class="detail-sub">Vueltas del entrenamiento</h4>
+        <div class="table-wrap">
+        <table class="splits">
+          <thead><tr><th>#</th><th class="num">Dist.</th><th class="num">Tiempo</th><th class="num">Ritmo</th><th style="width:28%">&nbsp;</th><th class="num">FC</th><th class="num">Pot.</th><th class="num">Desnivel</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td>1</td>
+              <td class="num">1 km</td>
+              <td class="num">4:58</td>
+              <td class="num">4:58</td>
+              <td><div class="split-bar"><i style="width: 96%"></i></div></td>
+              <td class="num">133</td>
+              <td class="num">222</td>
+              <td class="num">+2/-12 m</td>
+            </tr>
+            
+            <tr>
+              <td>2</td>
+              <td class="num">1 km</td>
+              <td class="num">4:55</td>
+              <td class="num">4:55</td>
+              <td><div class="split-bar"><i style="width: 97%"></i></div></td>
+              <td class="num">154</td>
+              <td class="num">241</td>
+              <td class="num">+11/-1 m</td>
+            </tr>
+            
+            <tr>
+              <td>3</td>
+              <td class="num">1 km</td>
+              <td class="num">4:52</td>
+              <td class="num">4:52</td>
+              <td><div class="split-bar"><i style="width: 98%"></i></div></td>
+              <td class="num">153</td>
+              <td class="num">240</td>
+              <td class="num">+12/-4 m</td>
+            </tr>
+            
+            <tr>
+              <td>4</td>
+              <td class="num">1 km</td>
+              <td class="num">4:57</td>
+              <td class="num">4:57</td>
+              <td><div class="split-bar"><i style="width: 96%"></i></div></td>
+              <td class="num">148</td>
+              <td class="num">232</td>
+              <td class="num">+9/-3 m</td>
+            </tr>
+            
+            <tr>
+              <td>5</td>
+              <td class="num">1 km</td>
+              <td class="num">4:46</td>
+              <td class="num fastest">4:46</td>
+              <td><div class="split-bar"><i style="width: 100%"></i></div></td>
+              <td class="num">144</td>
+              <td class="num">227</td>
+              <td class="num">+0/-16 m</td>
+            </tr>
+            
+            <tr>
+              <td>6</td>
+              <td class="num">1 km</td>
+              <td class="num">5:04</td>
+              <td class="num">5:04</td>
+              <td><div class="split-bar"><i style="width: 94%"></i></div></td>
+              <td class="num">144</td>
+              <td class="num">226</td>
+              <td class="num">+3/-9 m</td>
+            </tr>
+            
+            <tr>
+              <td>7</td>
+              <td class="num">629 m</td>
+              <td class="num">3:08</td>
+              <td class="num">5:00</td>
+              <td><div class="split-bar"><i style="width: 96%"></i></div></td>
+              <td class="num">149</td>
+              <td class="num">235</td>
+              <td class="num">+8/-2 m</td>
+            </tr>
+            
+          </tbody>
+        </table>
+        </div>
+        
+        
+        <h4 class="detail-sub">Parciales por kilómetro</h4>
+        <div class="table-wrap">
+        <table class="splits">
+          <thead><tr><th>Km</th><th>Ritmo</th><th style="width:38%">&nbsp;</th><th class="num">FC</th><th class="num">Desnivel</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td>1</td>
+              <td class="num">4:58</td>
+              <td><div class="split-bar"><i style="width: 96%"></i></div></td>
+              <td class="num">133</td>
+              <td class="num">+2/-12 m</td>
+            </tr>
+            
+            <tr>
+              <td>2</td>
+              <td class="num">4:55</td>
+              <td><div class="split-bar"><i style="width: 97%"></i></div></td>
+              <td class="num">154</td>
+              <td class="num">+11/-1 m</td>
+            </tr>
+            
+            <tr>
+              <td>3</td>
+              <td class="num">4:52</td>
+              <td><div class="split-bar"><i style="width: 98%"></i></div></td>
+              <td class="num">153</td>
+              <td class="num">+12/-4 m</td>
+            </tr>
+            
+            <tr>
+              <td>4</td>
+              <td class="num">4:57</td>
+              <td><div class="split-bar"><i style="width: 96%"></i></div></td>
+              <td class="num">148</td>
+              <td class="num">+9/-3 m</td>
+            </tr>
+            
+            <tr>
+              <td>5</td>
+              <td class="num fastest">4:46</td>
+              <td><div class="split-bar"><i style="width: 100%"></i></div></td>
+              <td class="num">144</td>
+              <td class="num">+0/-16 m</td>
+            </tr>
+            
+            <tr>
+              <td>6</td>
+              <td class="num">5:04</td>
+              <td><div class="split-bar"><i style="width: 94%"></i></div></td>
+              <td class="num">144</td>
+              <td class="num">+3/-9 m</td>
+            </tr>
+            
+            <tr>
+              <td>0.63</td>
+              <td class="num">5:00</td>
+              <td><div class="split-bar"><i style="width: 96%"></i></div></td>
+              <td class="num">149</td>
+              <td class="num">+8/-2 m</td>
+            </tr>
+            
+          </tbody>
+        </table>
+        </div>
+        
+      </div>
       
     </details>
     
-    <details class="activity" data-empty="1">
+    <details class="activity" >
       <summary>
         <span class="a-day">Sáb 2</span>
         <span class="a-name">Outdoor Run — San Javier Department Run <span class="chip run">Ruta</span></span>
         <span class="num">16 min</span>
         <span class="num">2.7 km</span>
         <span class="num">147</span>
-        <span class="num">—</span>
-        <span class="num">—</span>
-        <span class="a-chevron"></span>
+        <span class="num">23</span>
+        <span class="num">+53 m</span>
+        <span class="a-chevron">&#9662;</span>
       </summary>
+      
+      <div class="a-detail">
+        
+        <div class="a-stats">
+          
+          <div class="a-stat"><span class="label">Carga</span><span class="value">23</span></div>
+          
+          <div class="a-stat"><span class="label">Desnivel</span><span class="value">+53/-55 m</span></div>
+          
+          <div class="a-stat"><span class="label">TE aeróbico</span><span class="value">1.3</span></div>
+          
+          <div class="a-stat"><span class="label">TE anaeróbico</span><span class="value">0.1</span></div>
+          
+          <div class="a-stat"><span class="label">Potencia media</span><span class="value">197 W</span></div>
+          
+          <div class="a-stat"><span class="label">Cadencia</span><span class="value">154 spm</span></div>
+          
+          <div class="a-stat"><span class="label">Ritmo ajustado</span><span class="value">5:49 /km</span></div>
+          
+          <div class="a-stat"><span class="label">Mejor km</span><span class="value">4:58 /km</span></div>
+          
+          <div class="a-stat"><span class="label">Foco</span><span class="value">Recovery</span></div>
+          
+        </div>
+        
+        
+        <h4 class="detail-sub">Vueltas del entrenamiento</h4>
+        <div class="table-wrap">
+        <table class="splits">
+          <thead><tr><th>#</th><th class="num">Dist.</th><th class="num">Tiempo</th><th class="num">Ritmo</th><th style="width:28%">&nbsp;</th><th class="num">FC</th><th class="num">Pot.</th><th class="num">Desnivel</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td>1</td>
+              <td class="num">1 km</td>
+              <td class="num">7:14</td>
+              <td class="num">7:14</td>
+              <td><div class="split-bar"><i style="width: 71%"></i></div></td>
+              <td class="num">143</td>
+              <td class="num">170</td>
+              <td class="num">+32/-12 m</td>
+            </tr>
+            
+            <tr>
+              <td>2</td>
+              <td class="num">1 km</td>
+              <td class="num">5:09</td>
+              <td class="num fastest">5:09</td>
+              <td><div class="split-bar"><i style="width: 100%"></i></div></td>
+              <td class="num">146</td>
+              <td class="num">236</td>
+              <td class="num">+18/-23 m</td>
+            </tr>
+            
+            <tr>
+              <td>3</td>
+              <td class="num">716 m</td>
+              <td class="num">4:15</td>
+              <td class="num">5:57</td>
+              <td><div class="split-bar"><i style="width: 87%"></i></div></td>
+              <td class="num">155</td>
+              <td class="num">197</td>
+              <td class="num">+3/-20 m</td>
+            </tr>
+            
+          </tbody>
+        </table>
+        </div>
+        
+        
+        <h4 class="detail-sub">Parciales por kilómetro</h4>
+        <div class="table-wrap">
+        <table class="splits">
+          <thead><tr><th>Km</th><th>Ritmo</th><th style="width:38%">&nbsp;</th><th class="num">FC</th><th class="num">Desnivel</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td>1</td>
+              <td class="num">7:14</td>
+              <td><div class="split-bar"><i style="width: 71%"></i></div></td>
+              <td class="num">144</td>
+              <td class="num">+32/-12 m</td>
+            </tr>
+            
+            <tr>
+              <td>2</td>
+              <td class="num fastest">5:09</td>
+              <td><div class="split-bar"><i style="width: 100%"></i></div></td>
+              <td class="num">146</td>
+              <td class="num">+18/-23 m</td>
+            </tr>
+            
+            <tr>
+              <td>0.72</td>
+              <td class="num">5:57</td>
+              <td><div class="split-bar"><i style="width: 87%"></i></div></td>
+              <td class="num">155</td>
+              <td class="num">+3/-20 m</td>
+            </tr>
+            
+          </tbody>
+        </table>
+        </div>
+        
+      </div>
       
     </details>
     
-    <details class="activity" data-empty="1">
+    <details class="activity" >
       <summary>
         <span class="a-day">Sáb 2</span>
         <span class="a-name">Trail Run — San Javier Department Trail Run <span class="chip trail_run">Trail</span></span>
         <span class="num">5 h 09 min</span>
         <span class="num">46.0 km</span>
         <span class="num">161</span>
-        <span class="num">—</span>
-        <span class="num">—</span>
-        <span class="a-chevron"></span>
+        <span class="num">653</span>
+        <span class="num">+2632 m</span>
+        <span class="a-chevron">&#9662;</span>
       </summary>
+      
+      <div class="a-detail">
+        
+        <div class="a-stats">
+          
+          <div class="a-stat"><span class="label">Carga</span><span class="value">653</span></div>
+          
+          <div class="a-stat"><span class="label">Desnivel</span><span class="value">+2632/-2675 m</span></div>
+          
+          <div class="a-stat"><span class="label">TE aeróbico</span><span class="value">5.1</span></div>
+          
+          <div class="a-stat"><span class="label">TE anaeróbico</span><span class="value">4.2</span></div>
+          
+          <div class="a-stat"><span class="label">Potencia media</span><span class="value">213 W</span></div>
+          
+          <div class="a-stat"><span class="label">Cadencia</span><span class="value">160 spm</span></div>
+          
+          <div class="a-stat"><span class="label">Ritmo ajustado</span><span class="value">4:41 /km</span></div>
+          
+          <div class="a-stat"><span class="label">Mejor km</span><span class="value">3:19 /km</span></div>
+          
+          <div class="a-stat"><span class="label">Foco</span><span class="value">Base</span></div>
+          
+        </div>
+        
+        
+        
+      </div>
       
     </details>
     
@@ -387,6 +1038,8 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
     
     <div class="chart-card"><h3>Distancia por día</h3><p class="sub">km</p><svg class="chart" viewBox="0 0 600 190" role="img" aria-label="Distancia por día (km)" preserveAspectRatio="xMidYMid meet"><text x="49.7" y="182" class="chart-axis" text-anchor="middle">Lun 27</text><rect x="24.7" y="125.2" width="50.1" height="38.8" rx="4" class="chart-bar"/><text x="49.7" y="120.2" class="chart-value" text-anchor="middle">13.3</text><text x="133.1" y="182" class="chart-axis" text-anchor="middle">Mar 28</text><rect x="108.1" y="140.7" width="50.1" height="23.3" rx="4" class="chart-bar"/><text x="133.1" y="135.7" class="chart-value" text-anchor="middle">8</text><text x="216.6" y="182" class="chart-axis" text-anchor="middle">Mié 29</text><rect x="191.5" y="134.6" width="50.1" height="29.4" rx="4" class="chart-bar"/><text x="216.6" y="129.6" class="chart-value" text-anchor="middle">10.1</text><text x="300.0" y="182" class="chart-axis" text-anchor="middle">Jue 30</text><rect x="275.0" y="144.7" width="50.1" height="19.3" rx="4" class="chart-bar"/><text x="300.0" y="139.7" class="chart-value" text-anchor="middle">6.6</text><text x="383.4" y="182" class="chart-axis" text-anchor="middle">Vie 1</text><text x="466.9" y="182" class="chart-axis" text-anchor="middle">Sáb 2</text><rect x="441.8" y="22.0" width="50.1" height="142.0" rx="4" class="chart-bar"/><text x="466.9" y="17.0" class="chart-value" text-anchor="middle">48.7</text><text x="550.3" y="182" class="chart-axis" text-anchor="middle">Dom 3</text></svg></div>
     
+    
+    <div class="chart-card"><h3>Carga por día</h3><p class="sub">training load</p><svg class="chart" viewBox="0 0 600 190" role="img" aria-label="Carga de entrenamiento por día" preserveAspectRatio="xMidYMid meet"><text x="49.7" y="182" class="chart-axis" text-anchor="middle">Lun 27</text><rect x="24.7" y="142.4" width="50.1" height="21.6" rx="4" class="chart-bar"/><text x="49.7" y="137.4" class="chart-value" text-anchor="middle">103</text><text x="133.1" y="182" class="chart-axis" text-anchor="middle">Mar 28</text><rect x="108.1" y="136.3" width="50.1" height="27.7" rx="4" class="chart-bar"/><text x="133.1" y="131.3" class="chart-value" text-anchor="middle">132</text><text x="216.6" y="182" class="chart-axis" text-anchor="middle">Mié 29</text><rect x="191.5" y="140.7" width="50.1" height="23.3" rx="4" class="chart-bar"/><text x="216.6" y="135.7" class="chart-value" text-anchor="middle">111</text><text x="300.0" y="182" class="chart-axis" text-anchor="middle">Jue 30</text><rect x="275.0" y="156.9" width="50.1" height="7.1" rx="4" class="chart-bar"/><text x="300.0" y="151.9" class="chart-value" text-anchor="middle">34</text><text x="383.4" y="182" class="chart-axis" text-anchor="middle">Vie 1</text><text x="466.9" y="182" class="chart-axis" text-anchor="middle">Sáb 2</text><rect x="441.8" y="22.0" width="50.1" height="142.0" rx="4" class="chart-bar"/><text x="466.9" y="17.0" class="chart-value" text-anchor="middle">676</text><text x="550.3" y="182" class="chart-axis" text-anchor="middle">Dom 3</text></svg></div>
     
     
     <div class="chart-card"><h3>HRV nocturno</h3><p class="sub">ms · línea punteada: media 28 días</p><svg class="chart" viewBox="0 0 600 190" role="img" aria-label="HRV nocturno (ms)" preserveAspectRatio="xMidYMid meet"><text x="49.7" y="182" class="chart-axis" text-anchor="middle">Lun 27</text><text x="133.1" y="182" class="chart-axis" text-anchor="middle">Mar 28</text><text x="216.6" y="182" class="chart-axis" text-anchor="middle">Mié 29</text><text x="300.0" y="182" class="chart-axis" text-anchor="middle">Jue 30</text><text x="383.4" y="182" class="chart-axis" text-anchor="middle">Vie 1</text><text x="466.9" y="182" class="chart-axis" text-anchor="middle">Sáb 2</text><text x="550.3" y="182" class="chart-axis" text-anchor="middle">Dom 3</text><line x1="8" y1="83.7" x2="592" y2="83.7" class="chart-baseline"/><polyline points="49.7,85.8 133.1,98.2 216.6,69.3 300.0,89.9 383.4,116.7 466.9,147.6 550.3,38.4" class="chart-line"/><circle cx="49.7" cy="85.8" r="3" class="chart-line-dot"/><circle cx="133.1" cy="98.2" r="3" class="chart-line-dot"/><circle cx="216.6" cy="69.3" r="3" class="chart-line-dot"/><circle cx="300.0" cy="89.9" r="3" class="chart-line-dot"/><circle cx="383.4" cy="116.7" r="3" class="chart-line-dot"/><circle cx="466.9" cy="147.6" r="3" class="chart-line-dot"/><circle cx="550.3" cy="38.4" r="3" class="chart-line-dot"/><text x="49.7" y="77.8" class="chart-value" text-anchor="middle">66</text><text x="133.1" y="90.2" class="chart-value" text-anchor="middle">60</text><text x="216.6" y="61.3" class="chart-value" text-anchor="middle">74</text><text x="300.0" y="81.9" class="chart-value" text-anchor="middle">64</text><text x="383.4" y="108.7" class="chart-value" text-anchor="middle">51</text><text x="466.9" y="139.6" class="chart-value" text-anchor="middle">36</text><text x="550.3" y="30.4" class="chart-value" text-anchor="middle">89</text></svg></div>
@@ -416,22 +1069,22 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
         
         <tr>
           <td>Lun 27</td><td class="num">66</td><td class="num">49</td>
-          <td class="num">7.2 h</td><td class="num">95</td><td class="num">—</td>
+          <td class="num">7.2 h</td><td class="num">95</td><td class="num">103</td>
         </tr>
         
         <tr>
           <td>Mar 28</td><td class="num">60</td><td class="num">49</td>
-          <td class="num">7.8 h</td><td class="num">94</td><td class="num">—</td>
+          <td class="num">7.8 h</td><td class="num">94</td><td class="num">132</td>
         </tr>
         
         <tr>
           <td>Mié 29</td><td class="num">74</td><td class="num">48</td>
-          <td class="num">8.2 h</td><td class="num">95</td><td class="num">—</td>
+          <td class="num">8.2 h</td><td class="num">95</td><td class="num">111</td>
         </tr>
         
         <tr>
           <td>Jue 30</td><td class="num">64</td><td class="num">48</td>
-          <td class="num">8.6 h</td><td class="num">92</td><td class="num">—</td>
+          <td class="num">8.6 h</td><td class="num">92</td><td class="num">34</td>
         </tr>
         
         <tr>
@@ -441,7 +1094,7 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
         
         <tr>
           <td>Sáb 2</td><td class="num">36</td><td class="num">49</td>
-          <td class="num">5.5 h</td><td class="num">52</td><td class="num">—</td>
+          <td class="num">5.5 h</td><td class="num">52</td><td class="num">676</td>
         </tr>
         
         <tr>
@@ -479,8 +1132,8 @@ footer { color: var(--muted); font-size: 0.78rem; margin-top: 44px; border-top: 
       </tr>
       
       <tr>
-        <td>Carga</td><td class="num">—</td><td class="num">—</td>
-        <td class="num ">—</td>
+        <td>Carga</td><td class="num">4359</td><td class="num">4005</td>
+        <td class="num delta-pos">+8.8%</td>
       </tr>
       
     </tbody>
